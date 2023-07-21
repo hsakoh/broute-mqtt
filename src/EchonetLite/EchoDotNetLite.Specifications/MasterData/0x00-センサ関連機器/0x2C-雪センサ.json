@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "検知閾値レベル",
+      "Code": "0xB0",
+      "Detail": "検知閾値レベルを８段階で指定。",
+      "Value": "0x31～0x38",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "雪検知状態",
+      "Code": "0xB1",
+      "Detail": "雪検知有無を示す。",
+      "Value": "雪検知有 0x41、雪検知無 0x42",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    }
+  ]
+}

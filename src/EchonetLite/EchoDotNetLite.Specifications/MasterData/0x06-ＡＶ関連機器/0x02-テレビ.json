@@ -1,0 +1,129 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "OptionRequierd": [
+        "エネルギーサービス"
+      ],
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "表示制御設定",
+      "Code": "0xB0",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "文字列設定受付可能状態",
+      "Code": "0xB1",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "OptionRequierd": [
+        "快適生活支援サービス",
+        "セキュリティサービス"
+      ],
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "表示可能文字コード",
+      "Code": "0xB2",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "DataType": "unsigned char×  2",
+      "LogicalDataType": "byte[]",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "OptionRequierd": [
+        "快適生活支援サービス",
+        "セキュリティサービス"
+      ],
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "伝達文字列設定",
+      "Code": "0xB3",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "",
+      "DataType": "unsigned  char×  Max 247",
+      "LogicalDataType": "byte[]",
+      "MinSize": null,
+      "MaxSize": 247,
+      "Get": true,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": true,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "受付け伝達文字列長",
+      "Code": "0xB4",
+      "Detail": "クラスグループコード 0x 06, クラスコード 0x 01,ディスプレークラス参照",
+      "Value": "プロパティ内容",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte[]",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "OptionRequierd": [
+        "快適生活支援サービス",
+        "セキュリティサービス"
+      ],
+      "Description": "",
+      "Unit": "－"
+    }
+  ]
+}

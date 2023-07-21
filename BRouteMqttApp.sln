@@ -1,0 +1,84 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkstackIpDotNet", "src\EchonetLite\SkstackIpDotNet\SkstackIpDotNet.csproj", "{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EchoDotNetLite", "src\EchonetLite\EchoDotNetLite\EchoDotNetLite.csproj", "{569D25DE-3615-412C-B196-F931AB48618E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EchoDotNetLite.Specifications", "src\EchonetLite\EchoDotNetLite.Specifications\EchoDotNetLite.Specifications.csproj", "{2DF31A70-E4CA-4197-9B40-E8E06B956770}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EchoDotNetLiteSkstackIpBridge", "src\EchonetLite\EchoDotNetLiteSkstackIpBridge\EchoDotNetLiteSkstackIpBridge.csproj", "{BD4384A0-2D63-4B10-A279-396D21383406}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAssistantAddOn.Core", "src\HomeAssistant\HomeAssistantAddOn.Core\HomeAssistantAddOn.Core.csproj", "{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAssistantAddOn.Mqtt", "src\HomeAssistant\HomeAssistantAddOn.Mqtt\HomeAssistantAddOn.Mqtt.csproj", "{846BC676-8B36-462D-BE67-B386BF3756FF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HomeAssistant", "HomeAssistant", "{1C309B10-486B-46D3-8B63-AB7E0D2C11BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EchonetLite", "EchonetLite", "{4FD98AE6-5A36-4BCB-97D9-818BA7D698F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRouteMqttApp", "src\BRouteMqttApp\BRouteMqttApp.csproj", "{E31E305E-FB7A-43E7-881D-815B035BDC7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRouteController", "src\BRouteController\BRouteController.csproj", "{A09D870B-88A0-4FCD-9B97-97697E53DD1E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{5C03D648-5D8B-4DCC-878C-BB671EC6AFB7}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{569D25DE-3615-412C-B196-F931AB48618E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{569D25DE-3615-412C-B196-F931AB48618E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{569D25DE-3615-412C-B196-F931AB48618E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{569D25DE-3615-412C-B196-F931AB48618E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF31A70-E4CA-4197-9B40-E8E06B956770}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF31A70-E4CA-4197-9B40-E8E06B956770}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF31A70-E4CA-4197-9B40-E8E06B956770}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF31A70-E4CA-4197-9B40-E8E06B956770}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD4384A0-2D63-4B10-A279-396D21383406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD4384A0-2D63-4B10-A279-396D21383406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD4384A0-2D63-4B10-A279-396D21383406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD4384A0-2D63-4B10-A279-396D21383406}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{846BC676-8B36-462D-BE67-B386BF3756FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{846BC676-8B36-462D-BE67-B386BF3756FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{846BC676-8B36-462D-BE67-B386BF3756FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{846BC676-8B36-462D-BE67-B386BF3756FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E31E305E-FB7A-43E7-881D-815B035BDC7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E31E305E-FB7A-43E7-881D-815B035BDC7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E31E305E-FB7A-43E7-881D-815B035BDC7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E31E305E-FB7A-43E7-881D-815B035BDC7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A09D870B-88A0-4FCD-9B97-97697E53DD1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A09D870B-88A0-4FCD-9B97-97697E53DD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A09D870B-88A0-4FCD-9B97-97697E53DD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A09D870B-88A0-4FCD-9B97-97697E53DD1E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E255BF66-8B4A-4B75-BFFB-ED09D46DCDB7} = {4FD98AE6-5A36-4BCB-97D9-818BA7D698F1}
+		{569D25DE-3615-412C-B196-F931AB48618E} = {4FD98AE6-5A36-4BCB-97D9-818BA7D698F1}
+		{2DF31A70-E4CA-4197-9B40-E8E06B956770} = {4FD98AE6-5A36-4BCB-97D9-818BA7D698F1}
+		{BD4384A0-2D63-4B10-A279-396D21383406} = {4FD98AE6-5A36-4BCB-97D9-818BA7D698F1}
+		{D5E6CC47-CDAF-4DE3-8DCB-D27A2B055CC2} = {1C309B10-486B-46D3-8B63-AB7E0D2C11BD}
+		{846BC676-8B36-462D-BE67-B386BF3756FF} = {1C309B10-486B-46D3-8B63-AB7E0D2C11BD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6F114C65-85D4-4CFB-B28F-8D7ECF11595E}
+	EndGlobalSection
+EndGlobal

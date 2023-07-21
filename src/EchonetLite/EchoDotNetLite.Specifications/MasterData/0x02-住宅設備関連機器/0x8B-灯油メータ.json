@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON/OFF の状態を示す。",
+      "Value": "ON=0x30、OFF=0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "-1",
+      "Unit": "-"
+    },
+    {
+      "Name": "積算灯油消費量計測値",
+      "Code": "0xE0",
+      "Detail": "積算灯油消費量を 0.1L で示す。",
+      "Value": "0x00000000～0x3B9AC9FF \r\n(0～99,999,999.9L)",
+      "DataType": "unsigned long",
+      "LogicalDataType": "ulong",
+      "MinSize": 4,
+      "MaxSize": 4,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "-2",
+      "Unit": "0.1 L"
+    },
+    {
+      "Name": "積算灯油消費量計測値履歴",
+      "Code": "0xE2",
+      "Detail": "積算灯油消費量の計測結果履歴を、30 分毎データを過去 24 時間で示す。",
+      "Value": "0x00000000～0x3B9AC9FF \r\n(0～99,999,999.9L)",
+      "DataType": "unsigned long×48",
+      "LogicalDataType": "byte[]",
+      "MinSize": 192,
+      "MaxSize": 192,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "-3",
+      "Unit": "0.1 L"
+    }
+  ]
+}

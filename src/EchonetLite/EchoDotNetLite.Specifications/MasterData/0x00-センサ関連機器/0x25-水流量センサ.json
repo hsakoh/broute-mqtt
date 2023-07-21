@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "積算流量計測値",
+      "Code": "0xE0",
+      "Detail": "積算流量計測値を cm3 で示す。",
+      "Value": "0x00000000～0x3B9AC9FF（0\r\n～999,999,999）",
+      "DataType": "unsigned long",
+      "LogicalDataType": "ulong",
+      "MinSize": 4,
+      "MaxSize": 4,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "cm3"
+    },
+    {
+      "Name": "流量計測値",
+      "Code": "0xE2",
+      "Detail": "流量瞬時計測値をcm3/minで示す。",
+      "Value": "0x00000000～0x3B9AC9FF（0\r\n～999,999,999）",
+      "DataType": "unsigned long",
+      "LogicalDataType": "ulong",
+      "MinSize": 4,
+      "MaxSize": 4,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "cm3/mi n"
+    }
+  ]
+}

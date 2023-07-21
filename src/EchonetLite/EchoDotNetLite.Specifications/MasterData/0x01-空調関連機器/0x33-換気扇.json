@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": true,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "換気自動設定",
+      "Code": "0xBF",
+      "Detail": "AUTO／非 AUTO",
+      "Value": "AUTO＝0x41,非 AUTO＝0x42",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "換気風量設定",
+      "Code": "0xA0",
+      "Detail": "換気風量レベルおよび換気風量自動状態を設定。換気風量レベルを 8 段階で指定。",
+      "Value": "換気風量自動状態＝0x41 換気風量レベル＝0x31～0x38",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    }
+  ]
+}

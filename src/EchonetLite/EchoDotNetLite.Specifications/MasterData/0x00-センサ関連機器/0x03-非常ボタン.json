@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "非常発生状態",
+      "Code": "0xB1",
+      "Detail": "非常の発生状況を示す。",
+      "Value": "非常発生有＝0x41，非常発生無＝\r\n0x42",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "非常発生状態リセット設定",
+      "Code": "0xBF",
+      "Detail": "0x00 を書き込むことにより、非常発生状態をリセットする。",
+      "Value": "リセット＝0x00",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": false,
+      "GetRequired": false,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    }
+  ]
+}

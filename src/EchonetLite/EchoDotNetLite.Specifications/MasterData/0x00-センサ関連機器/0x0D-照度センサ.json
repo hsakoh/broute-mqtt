@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "照度計測値 1",
+      "Code": "0xE0",
+      "Detail": "照度計測値をルクスの単位で示す",
+      "Value": "0x0000～0xFFFD(0～65533 ルクス)",
+      "DataType": "unsigned short",
+      "LogicalDataType": "ushort",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "ルクス"
+    },
+    {
+      "Name": "照度計測値 2",
+      "Code": "0xE1",
+      "Detail": "照度計測値をｋルクスの単位で示す",
+      "Value": "0x0000 ～ 0xFFFD(0 ～ 65533k ルクス)",
+      "DataType": "unsigned short",
+      "LogicalDataType": "ushort",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "k ルクス"
+    }
+  ]
+}

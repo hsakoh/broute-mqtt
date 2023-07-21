@@ -1,0 +1,60 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "体重計測値",
+      "Code": "0xE0",
+      "Detail": "体重計測値を 0.1kg 単位で示す。",
+      "Value": "0x0000～0xFFFD (0～6553.3kg)",
+      "DataType": "unsigned short",
+      "LogicalDataType": "ushort",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "0.1 kg"
+    },
+    {
+      "Name": "体脂肪計測値",
+      "Code": "0xE1",
+      "Detail": "体脂肪計測値を 0.1%単位で示す。",
+      "Value": "0x0000～0x03E8 (0～100.0%)",
+      "DataType": "unsigned short",
+      "LogicalDataType": "ushort",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": false,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "0.1 %"
+    }
+  ]
+}

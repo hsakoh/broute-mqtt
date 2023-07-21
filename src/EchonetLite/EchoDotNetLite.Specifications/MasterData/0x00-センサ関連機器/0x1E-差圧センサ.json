@@ -1,0 +1,42 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "Properties": [
+    {
+      "Name": "動作状態",
+      "Code": "0x80",
+      "Detail": "ON／OFF の状態を示す。",
+      "Value": "ＯＮ＝0x30，ＯＦＦ＝0x31",
+      "DataType": "unsigned char",
+      "LogicalDataType": "byte",
+      "MinSize": 1,
+      "MaxSize": 1,
+      "Get": true,
+      "GetRequired": true,
+      "Set": true,
+      "SetRequired": false,
+      "Anno": true,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "－"
+    },
+    {
+      "Name": "差圧計測値",
+      "Code": "0xE0",
+      "Detail": "差圧計測値を Pa で示す。",
+      "Value": "0x8001 ～ 0x7FFE( － 32767 ～\r\n32766)",
+      "DataType": "signed short",
+      "LogicalDataType": "short",
+      "MinSize": 2,
+      "MaxSize": 2,
+      "Get": true,
+      "GetRequired": true,
+      "Set": false,
+      "SetRequired": false,
+      "Anno": false,
+      "AnnoRequired": false,
+      "Description": "",
+      "Unit": "Pa"
+    }
+  ]
+}

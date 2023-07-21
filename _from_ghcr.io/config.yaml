@@ -1,0 +1,45 @@
+name: "BRoute-Mqtt"
+description: "Wi-SUNドングル/ECHONETLiteプロトコルを通じて、低圧スマート電力量メータをHoma AssistantのMQTTにデバイス/センサーとして統合するアドオン"
+version: "1.0.0"
+slug: "broute_mqtt"
+startup: application
+boot: manual
+init: false
+image: ghcr.io/hsakoh/broutemqtt-{arch}
+arch:
+  - aarch64
+  - amd64
+devices:
+  - '/dev/ttyUSB0'
+services:
+  - 'mqtt:need'
+options:
+  BRoute: 
+    Id: ''
+    Pw: ''
+    SerialPort: '/dev/ttyUSB0'
+    ForcePANScan: false
+    PanDescSavePath: '/data/EPANDESC.json'
+    InstantaneousValueInterval: '00:01:10'
+  Mqtt: 
+    Host: ''
+    Port: 1883
+    Id: ''
+    Pw: ''
+    Tls: false
+  LogLevel: 'Trace'
+schema:
+  BRoute: 
+    Id: str
+    Pw: password
+    SerialPort: str
+    ForcePANScan: bool
+    PanDescSavePath: str
+    InstantaneousValueInterval: str
+  Mqtt: 
+    Host: str
+    Port: "int(0,65535)"
+    Id: str
+    Pw: password
+    Tls: bool
+  LogLevel: list(Trace|Debug|Information|Warning|Error|Critical|None)

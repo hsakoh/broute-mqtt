@@ -1,0 +1,1207 @@
+{
+  "Version": "1.13",
+  "AppendixRelease": "K",
+  "プロファイル": [
+    {
+      "ClassGroupCode": "0x0E",
+      "ClassGroupNameOfficial": "プロファイルクラスグループ",
+      "ClassGroupName": "プロファイル",
+      "SuperClass": "プロファイルオブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0xF0",
+          "ClassNameOfficial": "ノードプロファイル",
+          "ClassName": "ノードプロファイル"
+        }
+      ]
+    }
+  ],
+  "機器": [
+    {
+      "ClassGroupCode": "0x00",
+      "ClassGroupNameOfficial": "センサ関連機器クラスグループ",
+      "ClassGroupName": "センサ関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0x01",
+          "ClassNameOfficial": "ガス漏れセンサ",
+          "ClassName": "ガス漏れセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x02",
+          "ClassNameOfficial": "防犯センサ",
+          "ClassName": "防犯センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x03",
+          "ClassNameOfficial": "非常ボタン",
+          "ClassName": "非常ボタン"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x04",
+          "ClassNameOfficial": "救急用センサ",
+          "ClassName": "救急用センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x05",
+          "ClassNameOfficial": "地震センサ",
+          "ClassName": "地震センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x06",
+          "ClassNameOfficial": "漏電センサ",
+          "ClassName": "漏電センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x07",
+          "ClassNameOfficial": "人体検知センサ",
+          "ClassName": "人体検知センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x08",
+          "ClassNameOfficial": "来客センサ",
+          "ClassName": "来客センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x09",
+          "ClassNameOfficial": "呼び出しセンサ",
+          "ClassName": "呼び出しセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0A",
+          "ClassNameOfficial": "結露センサ",
+          "ClassName": "結露センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0B",
+          "ClassNameOfficial": "空気汚染センサ",
+          "ClassName": "空気汚染センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0C",
+          "ClassNameOfficial": "酸素センサ",
+          "ClassName": "酸素センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0D",
+          "ClassNameOfficial": "照度センサ",
+          "ClassName": "照度センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0E",
+          "ClassNameOfficial": "音センサ",
+          "ClassName": "音センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x0F",
+          "ClassNameOfficial": "投函センサ",
+          "ClassName": "投函センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x10",
+          "ClassNameOfficial": "重荷センサ",
+          "ClassName": "重荷センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x11",
+          "ClassNameOfficial": "温度センサ",
+          "ClassName": "温度センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x12",
+          "ClassNameOfficial": "湿度センサ",
+          "ClassName": "湿度センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x13",
+          "ClassNameOfficial": "雨センサ",
+          "ClassName": "雨センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x14",
+          "ClassNameOfficial": "水位センサ",
+          "ClassName": "水位センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x15",
+          "ClassNameOfficial": "風呂水位センサ",
+          "ClassName": "風呂水位センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x16",
+          "ClassNameOfficial": "風呂沸き上がりセンサ",
+          "ClassName": "風呂沸き上がりセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x17",
+          "ClassNameOfficial": "水漏れセンサ",
+          "ClassName": "水漏れセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x18",
+          "ClassNameOfficial": "水あふれセンサ",
+          "ClassName": "水あふれセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x19",
+          "ClassNameOfficial": "火災センサ",
+          "ClassName": "火災センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1A",
+          "ClassNameOfficial": "タバコ煙センサ",
+          "ClassName": "タバコ煙センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1B",
+          "ClassNameOfficial": "ＣＯ２センサ",
+          "ClassName": "ＣＯ２センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1C",
+          "ClassNameOfficial": "ガスセンサ",
+          "ClassName": "ガスセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1D",
+          "ClassNameOfficial": "ＶＯＣセンサ",
+          "ClassName": "ＶＯＣセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1E",
+          "ClassNameOfficial": "差圧センサ",
+          "ClassName": "差圧センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x1F",
+          "ClassNameOfficial": "風速センサ",
+          "ClassName": "風速センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x20",
+          "ClassNameOfficial": "臭いセンサ",
+          "ClassName": "臭いセンサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x21",
+          "ClassNameOfficial": "炎センサ",
+          "ClassName": "炎センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x22",
+          "ClassNameOfficial": "電力量センサ",
+          "ClassName": "電力量センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x23",
+          "ClassNameOfficial": "電流量センサ",
+          "ClassName": "電流量センサ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x24",
+          "ClassNameOfficial": "昼光センサ",
+          "ClassName": "昼光センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x25",
+          "ClassNameOfficial": "水流量センサ",
+          "ClassName": "水流量センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x26",
+          "ClassNameOfficial": "微動センサ",
+          "ClassName": "微動センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x27",
+          "ClassNameOfficial": "通過センサ",
+          "ClassName": "通過センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x28",
+          "ClassNameOfficial": "在床センサ",
+          "ClassName": "在床センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x29",
+          "ClassNameOfficial": "開閉センサ",
+          "ClassName": "開閉センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x2A",
+          "ClassNameOfficial": "活動量センサ",
+          "ClassName": "活動量センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x2B",
+          "ClassNameOfficial": "人体位置センサ",
+          "ClassName": "人体位置センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x2C",
+          "ClassNameOfficial": "雪センサ",
+          "ClassName": "雪センサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x2D",
+          "ClassNameOfficial": "気圧センサ",
+          "ClassName": "気圧センサ"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x01",
+      "ClassGroupNameOfficial": "空調関連機器クラスグループ",
+      "ClassGroupName": "空調関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0x30",
+          "ClassNameOfficial": "家庭用エアコン",
+          "ClassName": "家庭用エアコン"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x31",
+          "ClassNameOfficial": "冷風機",
+          "ClassName": "冷風機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x32",
+          "ClassNameOfficial": "扇風機",
+          "ClassName": "扇風機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x33",
+          "ClassNameOfficial": "換気扇",
+          "ClassName": "換気扇"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x34",
+          "ClassNameOfficial": "空調換気扇",
+          "ClassName": "空調換気扇"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x35",
+          "ClassNameOfficial": "空気清浄器",
+          "ClassName": "空気清浄器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x36",
+          "ClassNameOfficial": "冷風扇",
+          "ClassName": "冷風扇"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x37",
+          "ClassNameOfficial": "サーキュレータ",
+          "ClassName": "サーキュレータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x38",
+          "ClassNameOfficial": "除湿機",
+          "ClassName": "除湿機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x39",
+          "ClassNameOfficial": "加湿器",
+          "ClassName": "加湿器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3A",
+          "ClassNameOfficial": "天井扇",
+          "ClassName": "天井扇"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3B",
+          "ClassNameOfficial": "電気こたつ",
+          "ClassName": "電気こたつ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3C",
+          "ClassNameOfficial": "電気あんか",
+          "ClassName": "電気あんか"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3D",
+          "ClassNameOfficial": "電気毛布",
+          "ClassName": "電気毛布"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3E",
+          "ClassNameOfficial": "ストーブ",
+          "ClassName": "ストーブ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x3F",
+          "ClassNameOfficial": "パネルヒータ",
+          "ClassName": "パネルヒータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x40",
+          "ClassNameOfficial": "電気カーペット",
+          "ClassName": "電気カーペット"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x41",
+          "ClassNameOfficial": "フロアヒータ",
+          "ClassName": "フロアヒータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x42",
+          "ClassNameOfficial": "電気暖房器",
+          "ClassName": "電気暖房器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x43",
+          "ClassNameOfficial": "ファンヒータ",
+          "ClassName": "ファンヒータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x44",
+          "ClassNameOfficial": "充電器",
+          "ClassName": "充電器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x47",
+          "ClassNameOfficial": "業務用パッケージエアコン蓄熱ユニット",
+          "ClassName": "業務用パッケージエアコン蓄熱ユニット"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x48",
+          "ClassNameOfficial": "業務用ファンコイルユニット",
+          "ClassName": "業務用ファンコイルユニット"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x49",
+          "ClassNameOfficial": "業務用空調冷熱源(チラー)",
+          "ClassName": "業務用空調冷熱源チラー"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x50",
+          "ClassNameOfficial": "業務用空調温熱源(ボイラー)",
+          "ClassName": "業務用空調温熱源ボイラー"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x51",
+          "ClassNameOfficial": "業務用空調 VAV",
+          "ClassName": "業務用空調VAV"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x52",
+          "ClassNameOfficial": "業務用空調エアハンドリングユニット",
+          "ClassName": "業務用空調エアハンドリングユニット"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x53",
+          "ClassNameOfficial": "ユニットクーラー",
+          "ClassName": "ユニットクーラー"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x54",
+          "ClassNameOfficial": "業務用コンデンシングユニット",
+          "ClassName": "業務用コンデンシングユニット"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x55",
+          "ClassNameOfficial": "電気蓄熱暖房器",
+          "ClassName": "電気蓄熱暖房器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x56",
+          "ClassNameOfficial": "業務用パッケージエアコン室内機（設備用除く）",
+          "ClassName": "業務用パッケージエアコン室内機設備用除く"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x57",
+          "ClassNameOfficial": "業務用パッケージエアコン室外機（設備用除く）",
+          "ClassName": "業務用パッケージエアコン室外機設備用除く"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x58",
+          "ClassNameOfficial": "業務用ガスヒートポンプエアコン室内機",
+          "ClassName": "業務用ガスヒートポンプエアコン室内機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x59",
+          "ClassNameOfficial": "業務用ガスヒートポンプエアコン室外機",
+          "ClassName": "業務用ガスヒートポンプエアコン室外機"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x02",
+      "ClassGroupNameOfficial": "住宅・設備関連機器クラスグループ",
+      "ClassGroupName": "住宅設備関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0x60",
+          "ClassNameOfficial": "電動ブラインド･日よけ",
+          "ClassName": "電動ブラインド日よけ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x61",
+          "ClassNameOfficial": "電動シャッター",
+          "ClassName": "電動シャッター"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x62",
+          "ClassNameOfficial": "電動カーテン",
+          "ClassName": "電動カーテン"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x63",
+          "ClassNameOfficial": "電動雨戸・シャッター",
+          "ClassName": "電動雨戸シャッター"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x64",
+          "ClassNameOfficial": "電動ゲート",
+          "ClassName": "電動ゲート"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x65",
+          "ClassNameOfficial": "電動窓",
+          "ClassName": "電動窓"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x66",
+          "ClassNameOfficial": "電動玄関ドア・引戸",
+          "ClassName": "電動玄関ドア引戸"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x67",
+          "ClassNameOfficial": "散水器（庭用）",
+          "ClassName": "散水器庭用"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x68",
+          "ClassNameOfficial": "散水器（火災用）",
+          "ClassName": "散水器火災用"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x69",
+          "ClassNameOfficial": "噴水",
+          "ClassName": "噴水"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x6A",
+          "ClassNameOfficial": "瞬間湯沸器",
+          "ClassName": "瞬間湯沸器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x6B",
+          "ClassNameOfficial": "電気温水器",
+          "ClassName": "電気温水器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x6C",
+          "ClassNameOfficial": "太陽熱温水器",
+          "ClassName": "太陽熱温水器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x6D",
+          "ClassNameOfficial": "循環ポンプ",
+          "ClassName": "循環ポンプ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x6E",
+          "ClassNameOfficial": "電気便座（温水洗浄便座、暖房便座など）",
+          "ClassName": "電気便座温水洗浄便座暖房便座など"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x6F",
+          "ClassNameOfficial": "電気錠",
+          "ClassName": "電気錠"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x70",
+          "ClassNameOfficial": "ガス元弁",
+          "ClassName": "ガス元弁"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x71",
+          "ClassNameOfficial": "ホームサウナ",
+          "ClassName": "ホームサウナ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x72",
+          "ClassNameOfficial": "瞬間式給湯器",
+          "ClassName": "瞬間式給湯器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x73",
+          "ClassNameOfficial": "浴室暖房乾燥機",
+          "ClassName": "浴室暖房乾燥機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x74",
+          "ClassNameOfficial": "ホームエレベータ",
+          "ClassName": "ホームエレベータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x75",
+          "ClassNameOfficial": "電動間仕切り",
+          "ClassName": "電動間仕切り"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x76",
+          "ClassNameOfficial": "水平トランスファ",
+          "ClassName": "水平トランスファ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x77",
+          "ClassNameOfficial": "電動物干し",
+          "ClassName": "電動物干し"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x78",
+          "ClassNameOfficial": "浄化槽",
+          "ClassName": "浄化槽"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x79",
+          "ClassNameOfficial": "住宅用太陽光発電",
+          "ClassName": "住宅用太陽光発電"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7A",
+          "ClassNameOfficial": "冷温水熱源機",
+          "ClassName": "冷温水熱源機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7B",
+          "ClassNameOfficial": "床暖房",
+          "ClassName": "床暖房"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7C",
+          "ClassNameOfficial": "燃料電池",
+          "ClassName": "燃料電池"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7D",
+          "ClassNameOfficial": "蓄電池",
+          "ClassName": "蓄電池"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7E",
+          "ClassNameOfficial": "電気自動車充放電器",
+          "ClassName": "電気自動車充放電器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x7F",
+          "ClassNameOfficial": "エンジンコージェネレーション",
+          "ClassName": "エンジンコージェネレーション"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x80",
+          "ClassNameOfficial": "電力量メータ",
+          "ClassName": "電力量メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x81",
+          "ClassNameOfficial": "水流量メータ",
+          "ClassName": "水流量メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x82",
+          "ClassNameOfficial": "ガスメータ",
+          "ClassName": "ガスメータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x83",
+          "ClassNameOfficial": "LP ガスメータ",
+          "ClassName": "LPガスメータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x84",
+          "ClassNameOfficial": "時計",
+          "ClassName": "時計"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x85",
+          "ClassNameOfficial": "自動ドア",
+          "ClassName": "自動ドア"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x86",
+          "ClassNameOfficial": "業務用エレベータ",
+          "ClassName": "業務用エレベータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x87",
+          "ClassNameOfficial": "分電盤メータリング",
+          "ClassName": "分電盤メータリング"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x88",
+          "ClassNameOfficial": "低圧スマート電力量メータ",
+          "ClassName": "低圧スマート電力量メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x89",
+          "ClassNameOfficial": "スマートガスメータ",
+          "ClassName": "スマートガスメータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x8A",
+          "ClassNameOfficial": "高圧スマート電力量メータ",
+          "ClassName": "高圧スマート電力量メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x8B",
+          "ClassNameOfficial": "灯油メータ",
+          "ClassName": "灯油メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x8C",
+          "ClassNameOfficial": "スマート灯油メータ",
+          "ClassName": "スマート灯油メータ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x90",
+          "ClassNameOfficial": "一般照明",
+          "ClassName": "一般照明"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x91",
+          "ClassNameOfficial": "単機能照明",
+          "ClassName": "単機能照明"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x92",
+          "ClassNameOfficial": "固体発光光源用照明",
+          "ClassName": "固体発光光源用照明"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x99",
+          "ClassNameOfficial": "非常照明",
+          "ClassName": "非常照明"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x9D",
+          "ClassNameOfficial": "設備照明",
+          "ClassName": "設備照明"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA0",
+          "ClassNameOfficial": "ブザー",
+          "ClassName": "ブザー"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA1",
+          "ClassNameOfficial": "電気自動車充電器",
+          "ClassName": "電気自動車充電器"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA2",
+          "ClassNameOfficial": "Household small wind turbinepower generation",
+          "ClassName": "HouseholdSmallWindTurbinepowerGeneration"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA3",
+          "ClassNameOfficial": "照明システム",
+          "ClassName": "照明システム"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA4",
+          "ClassNameOfficial": "拡張照明システム",
+          "ClassName": "拡張照明システム"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xA5",
+          "ClassNameOfficial": "マルチ入力 PCS",
+          "ClassName": "マルチ入力PCS"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x03",
+      "ClassGroupNameOfficial": "調理・家事関連機器クラスグループ",
+      "ClassGroupName": "調理家事関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": false,
+          "ClassCode": "0xB0",
+          "ClassNameOfficial": "コーヒーメーカ",
+          "ClassName": "コーヒーメーカ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xB1",
+          "ClassNameOfficial": "コーヒーミル",
+          "ClassName": "コーヒーミル"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xB2",
+          "ClassNameOfficial": "電気ポット",
+          "ClassName": "電気ポット"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xB3",
+          "ClassNameOfficial": "電気こんろ",
+          "ClassName": "電気こんろ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xB4",
+          "ClassNameOfficial": "トースタ",
+          "ClassName": "トースタ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xB5",
+          "ClassNameOfficial": "ジューサ・ミキサ",
+          "ClassName": "ジューサミキサ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xB6",
+          "ClassNameOfficial": "フードプロセッサ",
+          "ClassName": "フードプロセッサ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xB7",
+          "ClassNameOfficial": "冷凍冷蔵庫",
+          "ClassName": "冷凍冷蔵庫"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xB8",
+          "ClassNameOfficial": "オーブンレンジ",
+          "ClassName": "オーブンレンジ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xB9",
+          "ClassNameOfficial": "クッキングヒータ",
+          "ClassName": "クッキングヒータ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xBA",
+          "ClassNameOfficial": "オーブン",
+          "ClassName": "オーブン"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xBB",
+          "ClassNameOfficial": "炊飯器",
+          "ClassName": "炊飯器"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xBC",
+          "ClassNameOfficial": "電子ジャー",
+          "ClassName": "電子ジャー"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xBD",
+          "ClassNameOfficial": "食器洗い機",
+          "ClassName": "食器洗い機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xBE",
+          "ClassNameOfficial": "食器乾燥機",
+          "ClassName": "食器乾燥機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xBF",
+          "ClassNameOfficial": "電気もちつき機",
+          "ClassName": "電気もちつき機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC0",
+          "ClassNameOfficial": "保温機",
+          "ClassName": "保温機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC1",
+          "ClassNameOfficial": "精米機",
+          "ClassName": "精米機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC2",
+          "ClassNameOfficial": "自動製パン機",
+          "ClassName": "自動製パン機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC3",
+          "ClassNameOfficial": "スロークッカ",
+          "ClassName": "スロークッカ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC4",
+          "ClassNameOfficial": "電気漬物機",
+          "ClassName": "電気漬物機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xC5",
+          "ClassNameOfficial": "洗濯機",
+          "ClassName": "洗濯機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xC6",
+          "ClassNameOfficial": "衣類乾燥機",
+          "ClassName": "衣類乾燥機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC7",
+          "ClassNameOfficial": "電気アイロン",
+          "ClassName": "電気アイロン"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC8",
+          "ClassNameOfficial": "ズボンプレッサ",
+          "ClassName": "ズボンプレッサ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xC9",
+          "ClassNameOfficial": "ふとん乾燥機",
+          "ClassName": "ふとん乾燥機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xCA",
+          "ClassNameOfficial": "小物・くつ乾燥機",
+          "ClassName": "小物くつ乾燥機"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xCB",
+          "ClassNameOfficial": "電気掃除機（セントラルクリーナ含む）",
+          "ClassName": "電気掃除機セントラルクリーナ含む"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xCC",
+          "ClassNameOfficial": "ディスポーザ",
+          "ClassName": "ディスポーザ"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xCD",
+          "ClassNameOfficial": "電気蚊取り機",
+          "ClassName": "電気蚊取り機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xCE",
+          "ClassNameOfficial": "業務用ショーケース",
+          "ClassName": "業務用ショーケース"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xCF",
+          "ClassNameOfficial": "業務用冷蔵庫",
+          "ClassName": "業務用冷蔵庫"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xD0",
+          "ClassNameOfficial": "業務用ホットケース",
+          "ClassName": "業務用ホットケース"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xD1",
+          "ClassNameOfficial": "業務用フライヤー",
+          "ClassName": "業務用フライヤー"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xD2",
+          "ClassNameOfficial": "業務用電子レンジ",
+          "ClassName": "業務用電子レンジ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xD3",
+          "ClassNameOfficial": "洗濯乾燥機",
+          "ClassName": "洗濯乾燥機"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xD4",
+          "ClassNameOfficial": "業務用ショーケース向け室外機",
+          "ClassName": "業務用ショーケース向け室外機"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x04",
+      "ClassGroupNameOfficial": "健康関連機器クラスグループ",
+      "ClassGroupName": "健康関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0x01",
+          "ClassNameOfficial": "体重計",
+          "ClassName": "体重計"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x02",
+          "ClassNameOfficial": "体温計",
+          "ClassName": "体温計"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x03",
+          "ClassNameOfficial": "血圧計",
+          "ClassName": "血圧計"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x04",
+          "ClassNameOfficial": "血糖値計",
+          "ClassName": "血糖値計"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0x05",
+          "ClassNameOfficial": "体脂肪計",
+          "ClassName": "体脂肪計"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x05",
+      "ClassGroupNameOfficial": "管理・操作関連機器クラスグループ",
+      "ClassGroupName": "管理操作関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0xFA",
+          "ClassNameOfficial": "並列処理併用型電力制御",
+          "ClassName": "並列処理併用型電力制御"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xFB",
+          "ClassNameOfficial": "DR イベントコントローラ",
+          "ClassName": "DRイベントコントローラ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xFC",
+          "ClassNameOfficial": "セ キ ュ ア 通 信 用 共 有 鍵 設 定 ノード",
+          "ClassName": "セキュア通信用共有鍵設定ノード"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xFD",
+          "ClassNameOfficial": "スイッチ（JEMA/HA 端子対応）",
+          "ClassName": "スイッチJEMAHA端子対応"
+        },
+        {
+          "Status": false,
+          "ClassCode": "0xFE",
+          "ClassNameOfficial": "携帯端末",
+          "ClassName": "携帯端末"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0xFF",
+          "ClassNameOfficial": "コントローラ",
+          "ClassName": "コントローラ"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x06",
+      "ClassGroupNameOfficial": "ＡＶ関連機器クラスグループ",
+      "ClassGroupName": "ＡＶ関連機器",
+      "SuperClass": "機器オブジェクトスーパークラス",
+      "ClassList": [
+        {
+          "Status": true,
+          "ClassCode": "0x01",
+          "ClassNameOfficial": "ディスプレー",
+          "ClassName": "ディスプレー"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x02",
+          "ClassNameOfficial": "テレビ",
+          "ClassName": "テレビ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x03",
+          "ClassNameOfficial": "オーディオ",
+          "ClassName": "オーディオ"
+        },
+        {
+          "Status": true,
+          "ClassCode": "0x04",
+          "ClassNameOfficial": "ネットワークカメラ",
+          "ClassName": "ネットワークカメラ"
+        }
+      ]
+    },
+    {
+      "ClassGroupCode": "0x0F",
+      "ClassGroupNameOfficial": "ユーザ定義クラスグループ",
+      "ClassGroupName": "ユーザ定義",
+      "SuperClass": "",
+      "ClassList": []
+    }
+  ]
+}
