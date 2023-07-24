@@ -14,40 +14,72 @@ public class MqttService : IDisposable
 {
     private readonly ILogger<MqttService> _logger;
     private readonly IManagedMqttClient _mqttClient;
-    private readonly ManagedMqttClientOptions _mqttOption;
+    private readonly SupervisorApi _supervisorApi;
+    private readonly IOptionsMonitor<MqttOptions> _optionsMonitor;
     private readonly ConcurrentDictionary<string, List<Func<string, Task>>> _subscriptions = new();
 
     public MqttService(
         ILogger<MqttService> logger,
-        IOptionsMonitor<MqttOptions> optionsMonitor)
+        IOptionsMonitor<MqttOptions> optionsMonitor,
+        SupervisorApi supervisorApi)
     {
         _logger = logger;
+        _optionsMonitor = optionsMonitor;
+        _supervisorApi = supervisorApi;
 
         var mqttFactory = new MqttFactory();
         _mqttClient = mqttFactory.CreateManagedMqttClient();
         _mqttClient.ApplicationMessageReceivedAsync += ApplicationMessageReceivedAsync;
-        _mqttOption = new ManagedMqttClientOptionsBuilder()
-            .WithAutoReconnectDelay(TimeSpan.FromSeconds(10))
-            .WithClientOptions((builder) =>
-            {
-                var options = optionsMonitor.CurrentValue;
-                builder
-                    .WithTcpServer(options.Host, options.Port)
-                    .WithClientId(Assembly.GetEntryAssembly()!.FullName);
-                if (!string.IsNullOrEmpty(options.Id))
-                {
-                    builder.WithCredentials(options.Id, string.IsNullOrEmpty(options.Pw) ? null : options.Pw);
-                }
-                if (options.Tls)
-                {
-                    builder.WithTls();
-                }
-            })
-            .Build();
     }
 
     public async Task StartAsync()
     {
+        var options = _optionsMonitor.CurrentValue;
+        SupervisorApi.ServiceMqtt? serviceMqtt = null;
+        if (options.UseAutoConfig)
+        {
+            var response = await _supervisorApi.GetServicesMqtt();
+            if (response?.Result != "ok")
+            {
+                throw new InvalidOperationException($"mqtt autoconfig failed {response?.Result}");
+            }
+            serviceMqtt = response.Data;
+        }
+        var _mqttOption = new ManagedMqttClientOptionsBuilder()
+            .WithAutoReconnectDelay(TimeSpan.FromSeconds(10))
+            .WithClientOptions((builder) =>
+            {
+                var options = _optionsMonitor.CurrentValue;
+                if (options.UseAutoConfig)
+                {
+                    builder
+                        .WithTcpServer(serviceMqtt!.Host, serviceMqtt.Port)
+                        .WithClientId(Assembly.GetEntryAssembly()!.FullName);
+                    if (!string.IsNullOrEmpty(serviceMqtt.Username))
+                    {
+                        builder.WithCredentials(serviceMqtt.Username, string.IsNullOrEmpty(serviceMqtt.Password) ? null : serviceMqtt.Password);
+                    }
+                    if (serviceMqtt.Ssl)
+                    {
+                        builder.WithTls();
+                    }
+                }
+                else
+                {
+                    builder
+                        .WithTcpServer(options.Host, options.Port)
+                        .WithClientId(Assembly.GetEntryAssembly()!.FullName);
+                    if (!string.IsNullOrEmpty(options.Id))
+                    {
+                        builder.WithCredentials(options.Id, string.IsNullOrEmpty(options.Pw) ? null : options.Pw);
+                    }
+                    if (options.Tls)
+                    {
+                        builder.WithTls();
+                    }
+                }
+            })
+            .Build();
         await _mqttClient.StartAsync(_mqttOption);
         _logger.LogDebug("Start");
     }

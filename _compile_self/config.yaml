@@ -1,6 +1,6 @@
 name: "BRoute-Mqtt"
-description: "Wi-SUNドングル/ECHONETLiteプロトコルを通じて、低圧スマート電力量メータをHoma AssistantのMQTTにデバイス/センサーとして統合するアドオン"
-version: "1.0.0"
+description: "Wi-SUNドングル/ECHONETLiteプロトコルを通じて、低圧スマート電力量メータをHome AssistantのMQTTにデバイス/センサーとして統合するアドオン"
+version: "1.0.1"
 slug: "broute_mqtt"
 startup: application
 boot: manual
@@ -21,6 +21,7 @@ options:
     PanDescSavePath: '/data/EPANDESC.json'
     InstantaneousValueInterval: '00:01:10'
   Mqtt: 
+    AutoConfig: true
     Host: ''
     Port: 1883
     Id: ''
@@ -36,9 +37,10 @@ schema:
     PanDescSavePath: str
     InstantaneousValueInterval: str
   Mqtt: 
-    Host: str
-    Port: "int(0,65535)"
-    Id: str
-    Pw: password
-    Tls: bool
+    AutoConfig: bool
+    Host: str?
+    Port: "int(0,65535)?"
+    Id: str?
+    Pw: password?
+    Tls: bool?
   LogLevel: list(Trace|Debug|Information|Warning|Error|Critical|None)

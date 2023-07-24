@@ -1,5 +1,6 @@
 ﻿using HomeAssistantAddOn.Mqtt;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,12 @@ public static class DependencyInjectionExtensions
                 configuration.GetSection("Mqtt").Bind(settings);
             });
         services.AddSingleton<MqttService>();
+        services.AddSingleton<SupervisorApi>();
+        services.AddHttpClient(nameof(SupervisorApi), httpClient =>
+        {
+            httpClient.BaseAddress = new Uri("http://supervisor/");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Environment.GetEnvironmentVariable("SUPERVISOR_TOKEN")!);
+        });
         return services;
     }
 }
