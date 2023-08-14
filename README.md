@@ -43,7 +43,11 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 3種類の方法があります
 
 1. GitHub ContainerRegistoryに登録されたDockerイメージを参照する
-    1. `_from_ghcr.io`フォルダの中身(config.yamlのみ)を HA-OSの`/addons/broute-mqtt`に配置します
+    1. ホーム アシスタント UI でアドオン ストアに移動します (左側のメニューで[スーパーバイザー]、上部タブで[アドオン ストア] )
+    1. 右上隅にある 3 つの縦のドットを選択し、リポジトリを選択します
+    1. 「アドオン リポジトリの管理」画面で、`https://github.com/hsakoh/ha-addon` を入力し、「追加」をクリックします。
+    1. リポジトリを追加した後、アドオンのリストの一番下までスクロールするか、検索を使用してアドオンを見つけます
+    1. アドオンを選択し、「インストール」をクリックします
 1. 事前に.NETアプリをコンパイルと発行したうえで、HAOS上でDockerイメージをビルドする
     1. リポジトリのルートで`./_compile_self/dotnet_publish.ps1`を実行してください。
     1. `_compile_self`フォルダの中身一式を HA-OSの`/addons/broute-mqtt`に配置します
