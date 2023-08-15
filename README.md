@@ -43,10 +43,11 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 3種類の方法があります
 
 1. GitHub ContainerRegistoryに登録されたDockerイメージを参照する
-    1. ホーム アシスタント UI でアドオン ストアに移動します (左側のメニューで[スーパーバイザー]、上部タブで[アドオン ストア] )
-    1. 右上隅にある 3 つの縦のドットを選択し、リポジトリを選択します
-    1. 「アドオン リポジトリの管理」画面で、`https://github.com/hsakoh/ha-addon` を入力し、「追加」をクリックします。
-    1. リポジトリを追加した後、アドオンのリストの一番下までスクロールするか、検索を使用してアドオンを見つけます
+    1. [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhsakoh%2Fha-addon)
+        1. ホーム アシスタント UI でアドオン ストアに移動します (左側のメニューで[スーパーバイザー]、上部タブで[アドオン ストア] )
+        1. 右上隅にある 3 つの縦のドットを選択し、リポジトリを選択します
+        1. 「アドオン リポジトリの管理」画面で、`https://github.com/hsakoh/ha-addon` を入力し、「追加」をクリックします。
+        1. リポジトリを追加した後、アドオンのリストの一番下までスクロールするか、検索を使用してアドオンを見つけます
     1. アドオンを選択し、「インストール」をクリックします
 1. 事前に.NETアプリをコンパイルと発行したうえで、HAOS上でDockerイメージをビルドする
     1. リポジトリのルートで`./_compile_self/dotnet_publish.ps1`を実行してください。
