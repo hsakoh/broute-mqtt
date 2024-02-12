@@ -65,7 +65,7 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 |BRoute:ForcePANScan|`false`|PANスキャンを起動時に強制する場合、`true`を指定します<br>`false`の場合、過去の接続時のPANを参照する為、再起動時等で再接続が早くなります|
 |BRoute:PanDescSavePath|`/data/EPANDESC.json`|PANの情報を保存する先を指定します|
 |BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
-|Mqtt:UseAutoConfig|true|デフォルトのHome Assistant Mosquitto統合を使用しているアドオンユーザーは、Home Assistant Supervisor APIを介して接続の詳細を検出できるため、この値をTrueに設定できます。|
+|Mqtt:AutoConfig|true|デフォルトのHome Assistant Mosquitto統合を使用しているアドオンユーザーは、Home Assistant Supervisor APIを介して接続の詳細を検出できるため、この値をTrueに設定できます。|
 |Mqtt:Host|-|MQTTブローカー<br>ホスト名を指定します|
 |Mqtt:Port|`1883`|ポート番号を指定します|
 |Mqtt:Id|-|認証がある場合、IDを指定します|
