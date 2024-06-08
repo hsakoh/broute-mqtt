@@ -78,7 +78,7 @@ namespace EchoDotNetLiteSkstackIpBridge
             return (true, pan);
         }
 
-        public async Task<bool> JoinAsync(EPANDESC epandesc)
+        public async Task<bool> JoinAsync(EPANDESC epandesc, int timeoutMilliseconds = 30 * 1000)
         {
             await SKDevice.SKSRegAsync("S2", epandesc.Channel);
             await SKDevice.SKSRegAsync("S3", epandesc.PanID);
@@ -106,7 +106,7 @@ namespace EchoDotNetLiteSkstackIpBridge
             SKDevice.OnEVENTReceived += joinEvent;
             _logger.LogInformation($"PANA接続シーケンス開始");
             await SKDevice.SKJoinAsync(SmartMaterIpaddr);
-            if (await Task.WhenAny(joinTCS.Task, Task.Delay(30 * 1000)) == joinTCS.Task)
+            if (await Task.WhenAny(joinTCS.Task, Task.Delay(timeoutMilliseconds)) == joinTCS.Task)
             {
                 return await joinTCS.Task;
             }

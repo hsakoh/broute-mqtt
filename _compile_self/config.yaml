@@ -21,6 +21,15 @@ options:
     ForcePANScan: false
     PanDescSavePath: '/data/EPANDESC.json'
     InstantaneousValueInterval: '00:01:10'
+    PanScanMaxRetryAttempts: 3
+    PanScanRetryDelay: '00:01:00'
+    PanaConnectTimeout: '00:00:30'
+    PanaConnectMaxRetryAttempts: 3
+    PanaConnectRetryDelay: '00:01:00'
+    PropertyReadTimeout: '00:00:05'
+    PropertyReadMaxRetryAttempts: 3
+    PropertyReadRetryDelay: '00:00:05'
+    ContinuePollingOnError: true
   Mqtt: 
     AutoConfig: true
     Host: ''
@@ -37,6 +46,15 @@ schema:
     ForcePANScan: bool
     PanDescSavePath: str
     InstantaneousValueInterval: str
+    PanScanMaxRetryAttempts: int
+    PanScanRetryDelay: str
+    PanaConnectTimeout: str
+    PanaConnectMaxRetryAttempts: int
+    PanaConnectRetryDelay: str
+    PropertyReadTimeout: str
+    PropertyReadMaxRetryAttempts: int
+    PropertyReadRetryDelay: str
+    ContinuePollingOnError: bool
   Mqtt: 
     AutoConfig: bool
     Host: str?

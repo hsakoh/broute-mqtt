@@ -71,7 +71,7 @@ public class BRouteControllerService : IDisposable
         var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.InstantaneousValueInterval);
         while (await timer.WaitForNextTickAsync(ct))
         {
-            await ReadActivePropertiesAsync();
+            await ReadActivePropertiesAsync(_optionsMonitor.CurrentValue.ContinuePollingOnError);
         }
     }
 
@@ -79,7 +79,7 @@ public class BRouteControllerService : IDisposable
     public Func<Task>? PassivePropertiesOnTimeCallback;
     public Func<Task>? ActivePropertiesReadedCallback;
 
-    public async Task ReadActivePropertiesAsync()
+    public async Task ReadActivePropertiesAsync(bool continueOnError = false)
     {
         var node = Meter.EchoNode;
         var device = Meter.EchoObjectInstance;
@@ -94,28 +94,55 @@ public class BRouteControllerService : IDisposable
                 //0xD7 積算電力量有効桁数
                 var target = new byte[] { 0x97, 0x98, 0xD3, 0xE1, 0xD7 };
                 var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
-
-                await _echoClient.プロパティ値読み出し(
-                    _echoClient.SelfNode.Devices.First(),//コントローラー
-                    node, device, properties
-                    , 20 * 1000);
+                await ReadPropertyWithRetry(node, device, properties);
             }
             {
                 //0xE7 瞬時電力計測値
                 //0xE8 瞬時電流計測値
                 var target = new byte[] { 0xE7, 0xE8 };
                 var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
-
-                await _echoClient.プロパティ値読み出し(
-                    _echoClient.SelfNode.Devices.First(),//コントローラー
-                    node, device, properties
-                    , 20 * 1000);
+                await ReadPropertyWithRetry(node, device, properties);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "プロパティ値読み出しで例外");
+            if (!continueOnError)
+            {
+                throw;
             }
         }
         finally
         {
             _semaphore.Release();
         }
+    }
+
+    private async Task ReadPropertyWithRetry(EchoNode node, EchoObjectInstance device, IEnumerable<EchoPropertyInstance> properties)
+    {
+        (bool, List<PropertyRequest>)? readResult = null;
+        for (var count = 0; count <= _optionsMonitor.CurrentValue.PropertyReadMaxRetryAttempts; count++)
+        {
+            try
+            {
+                readResult = await _echoClient.プロパティ値読み出し(
+                _echoClient.SelfNode.Devices.First(),//コントローラー
+                node, device, properties
+                    , (int)_optionsMonitor.CurrentValue.PropertyReadTimeout.TotalMilliseconds);
+                break;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "{Delay} 後にプロパティ値読み出しを再試行します", _optionsMonitor.CurrentValue.PropertyReadRetryDelay);
+                await Task.Delay(_optionsMonitor.CurrentValue.PropertyReadRetryDelay);
+            }
+        }
+        if (readResult == null)
+        {
+            _logger.LogWarning("プロパティ値読み出し リトライオーバー");
+            throw new ApplicationException("プロパティ値読み出し リトライオーバー");
+        }
+        await Task.Delay(TimeSpan.FromSeconds(2));
     }
 
     public async Task ReadPassivePropertiesAsync()
@@ -133,22 +160,14 @@ public class BRouteControllerService : IDisposable
                 //0xD7 積算電力量有効桁数
                 var target = new byte[] { 0x97, 0x98, 0xD3, 0xE1, 0xD7 };
                 var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
-
-                await _echoClient.プロパティ値読み出し(
-                    _echoClient.SelfNode.Devices.First(),//コントローラー
-                    node, device, properties
-                    , 20 * 1000);
+                await ReadPropertyWithRetry(node, device, properties);
             }
             {
                 //0xE0 積算電力量計測値 (正方向計測値)
                 //0xE3 積算電力量計測値 (逆方向計測値)
                 var target = new byte[] { 0xE0, 0xE3 };
                 var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
-
-                await _echoClient.プロパティ値読み出し(
-                    _echoClient.SelfNode.Devices.First(),//コントローラー
-                    node, device, properties
-                    , 20 * 1000);
+                await ReadPropertyWithRetry(node, device, properties);
             }
         }
         catch (Exception ex)
@@ -176,7 +195,7 @@ public class BRouteControllerService : IDisposable
 
         if (epandesc == null)
         {
-            for (var count = 0; count < 4; count++)
+            for (var count = 0; count <= _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts; count++)
             {
                 (var scanResult, epandesc) = await _skStackClient.ScanAsync();
                 if (scanResult)
@@ -185,9 +204,11 @@ public class BRouteControllerService : IDisposable
                     break;
                 }
                 ct.ThrowIfCancellationRequested();
-                int delaySec = 60;
-                _logger.LogWarning("{Delay}秒後にスキャンを再試行します", 60);
-                await Task.Delay(TimeSpan.FromSeconds(delaySec), ct);
+                if(count != _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts)
+                {
+                    _logger.LogWarning("{Delay}後にスキャンを再試行します", _optionsMonitor.CurrentValue.PanScanRetryDelay);
+                    await Task.Delay(_optionsMonitor.CurrentValue.PanScanRetryDelay, ct);
+                }
             }
             if (epandesc == null)
             {
@@ -203,22 +224,25 @@ public class BRouteControllerService : IDisposable
 
     private async Task ConnectPanaAsync(EPANDESC epandesc, CancellationToken ct)
     {
-        for (var count = 0; count < 4; count++)
+        bool isSuccess = false;
+        for (var count = 0; count <= _optionsMonitor.CurrentValue.PanaConnectMaxRetryAttempts; count++)
         {
-            var joinResult = await _skStackClient.JoinAsync(epandesc);
+            isSuccess = await _skStackClient.JoinAsync(epandesc, (int)_optionsMonitor.CurrentValue.PanaConnectTimeout.TotalMilliseconds);
             ct.ThrowIfCancellationRequested();
-            if (joinResult)
+            if (isSuccess)
             {
                 break;
             }
-            if (epandesc == null)
+            if (count != _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts)
             {
-                _logger.LogWarning("PANA接続シーケンス リトライオーバー");
-                throw new ApplicationException("PANA接続シーケンス リトライオーバー");
+                _logger.LogWarning("{Delay}後に接続を再試行します", _optionsMonitor.CurrentValue.PanaConnectRetryDelay);
+                await Task.Delay(_optionsMonitor.CurrentValue.PanaConnectRetryDelay, ct);
             }
-            int delaySec = 60;
-            _logger.LogWarning("{Delay}秒後に接続を再試行します", 60);
-            await Task.Delay(TimeSpan.FromSeconds(delaySec), ct);
+        }
+        if (!isSuccess)
+        {
+            _logger.LogWarning("PANA接続シーケンス リトライオーバー");
+            throw new ApplicationException("PANA接続シーケンス リトライオーバー");
         }
     }
 
@@ -248,11 +272,7 @@ public class BRouteControllerService : IDisposable
         //まとめてもできるけど、大量に指定するとこけるのでプロパティ毎に
         foreach (var prop in device.GETProperties)
         {
-            cs.ThrowIfCancellationRequested();
-            await _echoClient.プロパティ値読み出し(
-            _echoClient.SelfNode.Devices.First(),//コントローラー
-            node, device, new EchoPropertyInstance[] { prop }
-                , 20 * 1000);
+            await ReadPropertyWithRetry(node, device, new EchoPropertyInstance[] { prop });
         }
         return (node, device);
     }
