@@ -3,13 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace HomeAssistantAddOn.Mqtt;
 
-public class SupervisorApi
+public class SupervisorApi(IHttpClientFactory httpClientFactory)
 {
-    private readonly HttpClient _httpClient;
-    public SupervisorApi(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient(nameof(SupervisorApi));
-    }
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(nameof(SupervisorApi));
 
     public async Task<SupoervisorResponse<ServiceMqtt>?> GetServicesMqtt()
     {
@@ -44,5 +40,11 @@ public class SupervisorApi
         public string Password { get; set; } = default!;
         [JsonPropertyName("addon")]
         public string Addon { get; set; } = default!;
+    }
+
+    public class AddonInfo
+    {
+        [JsonPropertyName("ingress_entry")]
+        public string IngressEntry { get; set; } = default!;
     }
 }

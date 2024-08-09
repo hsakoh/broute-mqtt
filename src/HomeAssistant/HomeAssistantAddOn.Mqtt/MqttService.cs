@@ -8,6 +8,7 @@ using MQTTnet.Server;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Security.Authentication;
 
 namespace HomeAssistantAddOn.Mqtt;
 public class MqttService : IDisposable
@@ -34,6 +35,11 @@ public class MqttService : IDisposable
 
     public async Task StartAsync()
     {
+        if (_mqttClient.IsStarted)
+        {
+            _logger.LogDebug("Already Started");
+            return;
+        }
         var options = _optionsMonitor.CurrentValue;
         SupervisorApi.ServiceMqtt? serviceMqtt = null;
         if (options.AutoConfig)
@@ -61,7 +67,9 @@ public class MqttService : IDisposable
                     }
                     if (serviceMqtt.Ssl)
                     {
-                        builder.WithTls();
+                        builder.WithTlsOptions(opt => {
+                            opt.WithSslProtocols(SslProtocols.Tls12);
+                        });
                     }
                 }
                 else
@@ -75,7 +83,9 @@ public class MqttService : IDisposable
                     }
                     if (options.Tls)
                     {
-                        builder.WithTls();
+                        builder.WithTlsOptions(opt => {
+                            opt.WithSslProtocols(SslProtocols.Tls12);
+                        });
                     }
                 }
             })
@@ -86,6 +96,11 @@ public class MqttService : IDisposable
 
     public async Task StopAsync()
     {
+        foreach(var subscription in _subscriptions)
+        {
+            await _mqttClient.UnsubscribeAsync(subscription.Key);
+        }
+        _subscriptions.Clear();
         await _mqttClient.StopAsync();
         _logger.LogDebug("Stop");
     }
@@ -96,7 +111,7 @@ public class MqttService : IDisposable
             , _ =>
             {
                 _mqttClient.SubscribeAsync(topic);
-                return new List<Func<string, Task>> { subscribeTask };
+                return [subscribeTask];
             }
             , (_, list) =>
             {
@@ -123,6 +138,17 @@ public class MqttService : IDisposable
         await _mqttClient.EnqueueAsync(new MqttApplicationMessageBuilder()
             .WithTopic(topic)
             .WithPayload(JsonConvert.SerializeObject(payload, MqttPaloadSerializerSetting))
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithRetainFlag(retain)
+            .Build());
+        _logger.LogDebug("Publish {topic}", topic);
+    }
+
+    public async Task PublishAsync(string topic, string jsonPayload, bool retain = false)
+    {
+        await _mqttClient.EnqueueAsync(new MqttApplicationMessageBuilder()
+            .WithTopic(topic)
+            .WithPayload(jsonPayload)
             .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
             .WithRetainFlag(retain)
             .Build());

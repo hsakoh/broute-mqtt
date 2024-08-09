@@ -19,7 +19,7 @@ public static class DependencyInjectionExtensions
         services.AddHttpClient(nameof(SupervisorApi), httpClient =>
         {
             httpClient.BaseAddress = new Uri("http://supervisor/");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Environment.GetEnvironmentVariable("SUPERVISOR_TOKEN")!);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Environment.GetEnvironmentVariable("SUPERVISOR_TOKEN")! ?? "invalid");
         });
         return services;
     }

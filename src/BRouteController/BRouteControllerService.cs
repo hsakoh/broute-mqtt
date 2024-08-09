@@ -262,7 +262,9 @@ public class BRouteControllerService : IDisposable
         }
     }
 
+#pragma warning disable IDE0060 // 未使用のパラメーターを削除します
     private async Task<(EchoNode node, EchoObjectInstance device)> ReadAllPropertiesAsync(CancellationToken cs)
+#pragma warning restore IDE0060 // 未使用のパラメーターを削除します
     {
         //Bルートなので、低圧スマート電力量メータ以外のデバイスは存在しない前提
         var node = _echoClient.NodeList.First();
@@ -272,7 +274,7 @@ public class BRouteControllerService : IDisposable
         //まとめてもできるけど、大量に指定するとこけるのでプロパティ毎に
         foreach (var prop in device.GETProperties)
         {
-            await ReadPropertyWithRetry(node, device, new EchoPropertyInstance[] { prop });
+            await ReadPropertyWithRetry(node, device, [prop]);
         }
         return (node, device);
     }

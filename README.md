@@ -90,6 +90,6 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
    * Windows上では、AddOnの構成ファイル`/data/options.json`にアクセスできないと思われるので、<br>`appsettings.Development.json`に構成を行ってください。
    * 発行時は、ridで`win-x64`等を指定してください。<br> [.NET Runtime Identifier (RID) カタログ | Microsoft Learn](https://learn.microsoft.com/ja-jp/dotnet/core/rid-catalog)
 * [.NET での汎用ホスト 既定の builder 設定](https://learn.microsoft.com/ja-jp/dotnet/core/extensions/generic-host#default-builder-settings)の通り、<br>環境変数やコマンドライン引数からも読み込み可能です<br>(階層は`BRoute:Id`等コロンを含めて表現が必要です)
-* Wi-SUN USBスティックとのやり取りは、[NuGet Gallery | System.IO.Ports 6.0.0](https://www.nuget.org/packages/System.IO.Ports/6.0.0)を使用しています。
+* Wi-SUN USBスティックとのやり取りは、[NuGet Gallery | System.IO.Ports 8.0.0](https://www.nuget.org/packages/System.IO.Ports/8.0.0)を使用しています。
    * Linux等向けは動作環境毎の発行が必要となる場合があります。(`linux-arm64`と`linux-musl-arm64`の違いとか)
    * 参考：[System.IO.Ports.SerialPort not working on Linux arm64 · Issue #74332 · dotnet/runtime](https://github.com/dotnet/runtime/issues/74332)

@@ -3,27 +3,16 @@ using HomeAssistantAddOn.Mqtt;
 
 namespace BRouteMqttApp;
 
-public class Worker : BackgroundService
-{
-    private readonly ILogger<Worker> _logger;
-    private readonly BRouteControllerService _bRouteControllerService;
-    private readonly MqttService _mqttService;
-
-    public Worker(
-        ILogger<Worker> logger
+public class Worker(
+    ILogger<Worker> logger
         , BRouteControllerService bRouteControllerService
         , MqttService mqttService
-        )
-    {
-        _logger = logger;
-        _bRouteControllerService = bRouteControllerService;
-        _mqttService = mqttService;
-    }
-
+        ) : BackgroundService
+{
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _mqttService.StartAsync();
-        await _bRouteControllerService.InitalizeAsync(cancellationToken);
+        await mqttService.StartAsync();
+        await bRouteControllerService.InitalizeAsync(cancellationToken);
 
         await PublishDeviceConfigsAsync();
 
@@ -34,27 +23,27 @@ public class Worker : BackgroundService
         await PublishDeviceStaticStatusAsync();
         SubscribeCommandTopic();
 
-        _bRouteControllerService.ActivePropertiesReadedCallback = PublishDeviceActiveStatusAsync;
-        _bRouteControllerService.PassivePropertiesReadedCallback = PublishDevicePassiveStatusAsync;
-        _bRouteControllerService.PassivePropertiesOnTimeCallback = PublishDevicePassiveOnTimeStatusAsync;
+        bRouteControllerService.ActivePropertiesReadedCallback = PublishDeviceActiveStatusAsync;
+        bRouteControllerService.PassivePropertiesReadedCallback = PublishDevicePassiveStatusAsync;
+        bRouteControllerService.PassivePropertiesOnTimeCallback = PublishDevicePassiveOnTimeStatusAsync;
 
         await base.StartAsync(cancellationToken);
     }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _bRouteControllerService.PollAsync(stoppingToken);
+        await bRouteControllerService.PollAsync(stoppingToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        await _mqttService.StopAsync();
+        await mqttService.StopAsync();
         await base.StopAsync(cancellationToken);
     }
 
     #region Configure Senser
     private async Task PublishDeviceConfigsAsync()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
+        var serial = bRouteControllerService.Meter.製造番号!;
         await PublishSensorConfigAsync(serial, "placement", "設置場所", "static", icon: "mdi:map-marker");
         await PublishSensorConfigAsync(serial, "version", "規格Version情報", "static", icon: "mdi:information");
         await PublishSensorConfigAsync(serial, "makercode", "メーカコード", "static", icon: "mdi:factory");
@@ -106,7 +95,7 @@ public class Worker : BackgroundService
                 name = nameof(低圧スマート電力量メータ),
             },
         };
-        await _mqttService.PublishAsync($"homeassistant/sensor/{type}_{serial}/config", payload, true);
+        await mqttService.PublishAsync($"homeassistant/sensor/{type}_{serial}/config", payload, true);
     }
 
     private async Task SendButtonConfigAsync(string serial, string type, string name, string device_class)
@@ -125,7 +114,7 @@ public class Worker : BackgroundService
                 name = nameof(低圧スマート電力量メータ),
             },
         };
-        await _mqttService.PublishAsync($"homeassistant/button/btn_{type}_{serial}/config", payload, true);
+        await mqttService.PublishAsync($"homeassistant/button/btn_{type}_{serial}/config", payload, true);
     }
     #endregion
 
@@ -133,88 +122,88 @@ public class Worker : BackgroundService
 
     public async Task PublishDeviceStaticStatusAsync()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
+        var serial = bRouteControllerService.Meter.製造番号!;
         await SendSensorStateAsync(serial, "static", new
         {
-            placement = _bRouteControllerService.Meter.設置場所,
-            version = _bRouteControllerService.Meter.規格Version情報,
-            makercode = _bRouteControllerService.Meter.メーカコード,
+            placement = bRouteControllerService.Meter.設置場所,
+            version = bRouteControllerService.Meter.規格Version情報,
+            makercode = bRouteControllerService.Meter.メーカコード,
             serialnumber = serial,
         });
-        _logger.LogInformation("ステータス(静的)通知 {a},{b},{c},{d}",
-            _bRouteControllerService.Meter.設置場所,
-            _bRouteControllerService.Meter.規格Version情報,
-            _bRouteControllerService.Meter.メーカコード,
+        logger.LogInformation("ステータス(静的)通知 {a},{b},{c},{d}",
+            bRouteControllerService.Meter.設置場所,
+            bRouteControllerService.Meter.規格Version情報,
+            bRouteControllerService.Meter.メーカコード,
             serial
             );
     }
     public async Task PublishDeviceActiveStatusAsync()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
+        var serial = bRouteControllerService.Meter.製造番号!;
         await SendSensorStateAsync(serial, "active", new
         {
-            instantaneous_current_r = _bRouteControllerService.Meter.瞬時電流計測値?.r,
-            instantaneous_current_t = _bRouteControllerService.Meter.瞬時電流計測値?.t,
-            instantaneous_electric_power = _bRouteControllerService.Meter.瞬時電力計測値,
-            timestamp = _bRouteControllerService.Meter.現在年月日時刻
+            instantaneous_current_r = bRouteControllerService.Meter.瞬時電流計測値?.r,
+            instantaneous_current_t = bRouteControllerService.Meter.瞬時電流計測値?.t,
+            instantaneous_electric_power = bRouteControllerService.Meter.瞬時電力計測値,
+            timestamp = bRouteControllerService.Meter.現在年月日時刻
         });
-        _logger.LogInformation("ステータス(瞬時)通知 {r}A,{t}A,{e}W,{time}",
-            _bRouteControllerService.Meter.瞬時電流計測値?.r,
-            _bRouteControllerService.Meter.瞬時電流計測値?.t,
-            _bRouteControllerService.Meter.瞬時電力計測値,
-            _bRouteControllerService.Meter.現在年月日時刻
+        logger.LogInformation("ステータス(瞬時)通知 {r}A,{t}A,{e}W,{time}",
+            bRouteControllerService.Meter.瞬時電流計測値?.r,
+            bRouteControllerService.Meter.瞬時電流計測値?.t,
+            bRouteControllerService.Meter.瞬時電力計測値,
+            bRouteControllerService.Meter.現在年月日時刻
             );
     }
     public async Task PublishDevicePassiveStatusAsync()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
+        var serial = bRouteControllerService.Meter.製造番号!;
         await SendSensorStateAsync(serial, "passive", new
         {
-            cumulative_normal = _bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
-            cumulative_reverse = _bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
-            timestamp = _bRouteControllerService.Meter.現在年月日時刻
+            cumulative_normal = bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
+            cumulative_reverse = bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
+            timestamp = bRouteControllerService.Meter.現在年月日時刻
         });
-        _logger.LogInformation("ステータス(積算)通知 {n}W,{r}W,{time}",
-            _bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
-            _bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
-            _bRouteControllerService.Meter.現在年月日時刻
+        logger.LogInformation("ステータス(積算)通知 {n}W,{r}W,{time}",
+            bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
+            bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
+            bRouteControllerService.Meter.現在年月日時刻
             );
     }
     public async Task PublishDevicePassiveOnTimeStatusAsync()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
+        var serial = bRouteControllerService.Meter.製造番号!;
         await SendSensorStateAsync(serial, "passive", new
         {
-            cumulative_normal = _bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
-            cumulative_reverse = _bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
-            timestamp = _bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime,
+            cumulative_normal = bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
+            cumulative_reverse = bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
+            timestamp = bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime,
         });
-        _logger.LogInformation("ステータス(積算-定時)通知 {n}W,{r}W,{time}",
-            _bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
-            _bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
-            _bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime
+        logger.LogInformation("ステータス(積算-定時)通知 {n}W,{r}W,{time}",
+            bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
+            bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
+            bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime
             );
     }
     private async Task SendSensorStateAsync(
         string serial, string subTopic, object payload)
     {
-        await _mqttService.PublishAsync($"homeassistant/sensor/{serial}/state/{subTopic}", payload, false);
+        await mqttService.PublishAsync($"homeassistant/sensor/{serial}/state/{subTopic}", payload, false);
     }
     #endregion
 
     private void SubscribeCommandTopic()
     {
-        var serial = _bRouteControllerService.Meter.製造番号!;
-        _mqttService.Subscribe($"homeassistant/button/{serial}/cmd", async (payload) =>
+        var serial = bRouteControllerService.Meter.製造番号!;
+        mqttService.Subscribe($"homeassistant/button/{serial}/cmd", async (payload) =>
         {
-            _logger.LogInformation("コマンドを受信:{payload}", payload);
+            logger.LogInformation("コマンドを受信:{payload}", payload);
             if (payload == "active")
             {
-                await _bRouteControllerService.ReadActivePropertiesAsync();
+                await bRouteControllerService.ReadActivePropertiesAsync();
             }
             else if (payload == "passive")
             {
-                await _bRouteControllerService.ReadPassivePropertiesAsync();
+                await bRouteControllerService.ReadPassivePropertiesAsync();
             }
         });
     }
