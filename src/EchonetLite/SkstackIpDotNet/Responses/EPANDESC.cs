@@ -15,7 +15,7 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="response"></param>
-        public EPANDESC(string response) : base(response)
+        public EPANDESC(string response, bool isBP35C0) : base(response)
         {
             var resp = response.Split("\r\n");
             Channel = resp[1].Split(':')[1];
@@ -23,10 +23,23 @@
             PanID = resp[3].Split(':')[1];
             Addr = resp[4].Split(':')[1];
             LQI = resp[5].Split(':')[1];
-            if (resp.Length > 6)
+            if (isBP35C0)
             {
-                //IEなしの場合、行がなしとなる
-                PairID = resp[6].Split(':')[1];
+
+                Side = resp[6].Split(':')[1];
+                if (resp.Length > 7)
+                {
+                    //IEなしの場合、行がなしとなる
+                    PairID = resp[7].Split(':')[1];
+                }
+            }
+            else
+            {
+                if (resp.Length > 6)
+                {
+                    //IEなしの場合、行がなしとなる
+                    PairID = resp[6].Split(':')[1];
+                }
             }
         }
 
@@ -50,6 +63,10 @@
         /// 受信したビーコンの受信 RSSI
         /// </summary>
         public string LQI { get; set; }
+        /// <summary>
+        /// スキャンを実行した MAC 面(0 または 1)
+        /// </summary>
+        public string Side { get; set; }
         /// <summary>
         /// （IE が含まれる場合）相手から受信した Pairing ID
         /// </summary>

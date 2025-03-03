@@ -9,7 +9,7 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="response"></param>
-        public ERXUDP(string response) : base(response)
+        public ERXUDP(string response, bool isBP35C0) : base(response)
         {
             var values = response.Split(' ');
             Sender = values[1];
@@ -18,8 +18,17 @@
             LPort = values[4];
             SenderLla = values[5];
             Secured = values[6];
-            DataLen = values[7];
-            Data = values[8];
+            if (isBP35C0)
+            {
+                Side = values[7];
+                DataLen = values[8];
+                Data = values[9];
+            }
+            else
+            {
+                DataLen = values[7];
+                Data = values[8];
+            }
         }
 
         /// <summary>
@@ -47,6 +56,10 @@
         /// 0: 受信した IP パケットを構成する MAC フレームが暗号化されていなかった場合
         /// </summary>
         public string Secured { get; set; }
+        /// <summary>
+        /// 受信した MAC 面 (0 or 1)
+        /// </summary>
+        public string Side { get; set; }
         /// <summary>
         /// 受信したデータの長さ
         /// </summary>

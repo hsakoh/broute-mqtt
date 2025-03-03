@@ -105,7 +105,7 @@ namespace SkstackIpDotNet
                 OnSerialReceived?.Invoke(this, data);
                 if (data.StartsWith("EVENT"))
                 {
-                    OnEVENTReceived?.Invoke(this, new EVENT(data));
+                    OnEVENTReceived?.Invoke(this, new EVENT(data, true));
                 }
                 else if (data.StartsWith("ERXTCP"))
                 {
@@ -113,7 +113,7 @@ namespace SkstackIpDotNet
                 }
                 else if (data.StartsWith("ERXUDP"))
                 {
-                    OnERXUDPReceived?.Invoke(this, new ERXUDP(data));
+                    OnERXUDPReceived?.Invoke(this, new ERXUDP(data, true));
                 }
                 else if (data.StartsWith("ETCP"))
                 {

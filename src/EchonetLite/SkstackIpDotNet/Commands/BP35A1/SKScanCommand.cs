@@ -40,7 +40,7 @@ namespace SkstackIpDotNet.Commands.BP35A1
             }
             else if (eventRow.StartsWith("EVENT"))//0x1F or 0x22
             {
-                response.@event = new EVENT(eventRow);
+                response.@event = new EVENT(eventRow, false);
                 //EVENTより後にEPANDESCが来ることがあるので、1秒後に終わらせる
                 Task.Delay(500).ContinueWith((t) =>
                 {
@@ -57,7 +57,7 @@ namespace SkstackIpDotNet.Commands.BP35A1
             }
             else if (isEEDSCANReceiveStart)
             {
-                response.eedscan = new EEDSCAN(eventRow);
+                response.eedscan = new EEDSCAN(eventRow, false);
                 isEEDSCANReceiveStart = false;
             }
             else if (eventRow.StartsWith("EPANDESC"))
@@ -73,13 +73,13 @@ namespace SkstackIpDotNet.Commands.BP35A1
                 eventBufferEPANDESC.Add(eventRow);
                 if (eventBufferEPANDESC.Count == 7 && Arg.ScanMode == ScanMode.ActiveScanWithIE)
                 {
-                    response.epandescs.Add(new EPANDESC(string.Join("\r\n", eventBufferEPANDESC)));
+                    response.epandescs.Add(new EPANDESC(string.Join("\r\n", eventBufferEPANDESC), false));
                     eventBufferEPANDESC.Clear();
                     isEPANDESCReceiveStart = false;
                 }
                 if (eventBufferEPANDESC.Count == 6 && Arg.ScanMode == ScanMode.ActiveScanWithoutIE)
                 {
-                    response.epandescs.Add(new EPANDESC(string.Join("\r\n", eventBufferEPANDESC)));
+                    response.epandescs.Add(new EPANDESC(string.Join("\r\n", eventBufferEPANDESC), false));
                     eventBufferEPANDESC.Clear();
                     isEPANDESCReceiveStart = false;
                 }

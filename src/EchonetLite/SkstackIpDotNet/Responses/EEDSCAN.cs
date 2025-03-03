@@ -12,10 +12,14 @@ namespace SkstackIpDotNet.Responses
         /// コンストラクタ
         /// </summary>
         /// <param name="response"></param>
-        public EEDSCAN(string response) : base(response)
+        public EEDSCAN(string response, bool isBP35C0) : base(response)
         {
             var resp = response.Split(' ');
-            for (int i = 0; i < resp.Length - 1; i += 2)
+            if (isBP35C0)
+            {
+                Side = resp[0];
+            }
+            for (int i = isBP35C0 ? 1 : 0; i < resp.Length - 1; i += 2)
             {
                 List.Add(new ChannelRssi()
                 {
@@ -25,6 +29,10 @@ namespace SkstackIpDotNet.Responses
             }
         }
 
+        /// <summary>
+        /// スキャンを実行した MAC 面(0 または 1)
+        /// </summary>
+        public string Side { get; set; }
         /// <summary>
         ///  ED スキャンの実行結果一覧
         /// </summary>
