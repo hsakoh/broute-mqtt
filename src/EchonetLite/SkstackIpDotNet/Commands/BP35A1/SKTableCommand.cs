@@ -1,6 +1,5 @@
-﻿using SkstackIpDotNet.Responses;
+﻿using SkstackIpDotNet.Responses.Table;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SkstackIpDotNet.Commands.BP35A1
@@ -89,7 +88,7 @@ namespace SkstackIpDotNet.Commands.BP35A1
         {
             get
             {
-                return new byte[] { (byte)(char)Mode };
+                return [(byte)(char)Mode];
             }
         }
     }

@@ -1,9 +1,6 @@
 ﻿using EchoDotNetLite.Enums;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using static EchoDotNetLite.Models.Frame;
 
 namespace EchoDotNetLite.Models
 {
@@ -27,7 +24,7 @@ namespace EchoDotNetLite.Models
         /// </summary>
         [JsonIgnore]
         public ESV ESV { get; set; }
-        [JsonProperty("ESV")]
+        [JsonProperty(nameof(ESV))]
         public string _ESV { get { return $"{(byte)ESV:X2}"; } }
 
         public List<PropertyRequest> OPCList { get; set; }

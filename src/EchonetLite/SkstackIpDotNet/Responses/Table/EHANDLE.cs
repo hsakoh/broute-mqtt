@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace SkstackIpDotNet.Responses
+namespace SkstackIpDotNet.Responses.Table
 {
     /// <summary>
     /// SKTABLEのレスポンス
@@ -17,7 +15,7 @@ namespace SkstackIpDotNet.Responses
         public EHANDLE(string response) : base(response)
         {
             var rows = response.Split("\r\n");
-            for(int i = 1; i < rows.Length; i++)
+            for (int i = 1; i < rows.Length; i++)
             {
                 var cols = rows[i].Split(' ');
                 List.Add(new TcpHandleState()

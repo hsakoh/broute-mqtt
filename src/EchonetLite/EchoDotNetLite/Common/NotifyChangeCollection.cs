@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EchoDotNetLite.Common
 {
-    internal class NotifyChangeCollection<TParent, TItem> : ICollection<TItem> where TParent : INotifyCollectionChanged<TItem>
+    internal class NotifyChangeCollection<TParent, TItem>(TParent parentNode) : ICollection<TItem> where TParent : INotifyCollectionChanged<TItem>
     {
-        public NotifyChangeCollection(TParent parentNode)
-        {
-            ParentNode = parentNode;
-            InnnerConnection = new List<TItem>();
-        }
-        private TParent ParentNode;
-        private List<TItem> InnnerConnection;
+        private readonly List<TItem> InnnerConnection = [];
         public int Count => InnnerConnection.Count;
 
         public bool IsReadOnly => false;
@@ -21,7 +13,7 @@ namespace EchoDotNetLite.Common
         public void Add(TItem item)
         {
             InnnerConnection.Add(item);
-            ParentNode.RaiseCollectionChanged(CollectionChangeType.Add,item);
+            parentNode.RaiseCollectionChanged(CollectionChangeType.Add, item);
         }
 
         public void Clear()
@@ -44,7 +36,7 @@ namespace EchoDotNetLite.Common
             InnnerConnection.CopyTo(array, arrayIndex);
             foreach (var item in array)
             {
-                ParentNode.RaiseCollectionChanged(CollectionChangeType.Remove, item);
+                parentNode.RaiseCollectionChanged(CollectionChangeType.Remove, item);
             }
         }
 
@@ -55,7 +47,7 @@ namespace EchoDotNetLite.Common
 
         public bool Remove(TItem item)
         {
-            ParentNode.RaiseCollectionChanged(CollectionChangeType.Remove, item);
+            parentNode.RaiseCollectionChanged(CollectionChangeType.Remove, item);
             return InnnerConnection.Remove(item);
         }
 

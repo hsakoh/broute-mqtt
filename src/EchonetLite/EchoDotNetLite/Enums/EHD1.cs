@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EchoDotNetLite.Enums
+﻿namespace EchoDotNetLite.Enums
 {
     public enum EHD1 : byte
     {

@@ -1,4 +1,4 @@
-﻿namespace SkstackIpDotNet.Responses
+﻿namespace SkstackIpDotNet.Responses.Table
 {
     /// <summary>
     /// TABLEコマンドのレスポンス基底クラス

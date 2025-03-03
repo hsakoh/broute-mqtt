@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SkstackIpDotNet.Responses
+﻿namespace SkstackIpDotNet.Responses.Table
 {
     /// <summary>
     /// SKTABLEのレスポンス

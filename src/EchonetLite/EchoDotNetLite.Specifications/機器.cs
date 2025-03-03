@@ -12,8 +12,8 @@ namespace EchoDotNetLite.Specifications
         /// <summary>
         /// 一覧
         /// </summary>
-        public static IEnumerable<IEchonetObject> クラス一覧 = new List<IEchonetObject>()
-        {
+        public static IEnumerable<IEchonetObject> クラス一覧 =
+        [
             センサ関連機器.ガス漏れセンサ,
             センサ関連機器.防犯センサ,
             センサ関連機器.非常ボタン,
@@ -128,7 +128,7 @@ namespace EchoDotNetLite.Specifications
             ＡＶ関連機器.オーディオ,
             ＡＶ関連機器.ネットワークカメラ,
             プロファイル.ノードプロファイル,
-        };
+        ];
         /// <summary>
         /// ECHONET Lite クラスグループ定義
         /// センサ関連機器クラスグループ

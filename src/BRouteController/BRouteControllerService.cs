@@ -204,7 +204,7 @@ public class BRouteControllerService : IDisposable
                     break;
                 }
                 ct.ThrowIfCancellationRequested();
-                if(count != _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts)
+                if (count != _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts)
                 {
                     _logger.LogWarning("{Delay}後にスキャンを再試行します", _optionsMonitor.CurrentValue.PanScanRetryDelay);
                     await Task.Delay(_optionsMonitor.CurrentValue.PanScanRetryDelay, ct);

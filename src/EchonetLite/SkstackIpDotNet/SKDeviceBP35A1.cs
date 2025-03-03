@@ -3,6 +3,7 @@ using SkstackIpDotNet.Commands;
 using SkstackIpDotNet.Commands.BP35A1;
 using SkstackIpDotNet.Events;
 using SkstackIpDotNet.Responses;
+using SkstackIpDotNet.Responses.Table;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;

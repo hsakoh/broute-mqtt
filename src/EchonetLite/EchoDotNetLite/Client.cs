@@ -25,7 +25,7 @@ namespace EchoDotNetLite
             {
                 NodeProfile = new EchoObjectInstance(Specifications.プロファイル.ノードプロファイル, 0x01),
             };
-            NodeList = new List<EchoNode>();
+            NodeList = [];
             //自己消費用
             OnFrameReceived += ReceiveFrame;
         }
@@ -81,13 +81,13 @@ namespace EchoDotNetLite
                     InstanceCode = 0x01,
 
                 })
-                , new List<EchoPropertyInstance>() { property }
+                , [property]
                 );
         }
         public async Task インスタンスリスト通知要求Async()
         {
             _logger.LogInformation("インスタンスリスト通知要求");
-            var a = new List<EchoPropertyInstance>() { new EchoPropertyInstance(
+            var a = new List<EchoPropertyInstance>() { new(
                 Specifications.プロファイル.ノードプロファイル.ClassGroup.ClassGroupCode,
                 Specifications.プロファイル.ノードプロファイル.Class.ClassCode,
                 0xD5//インスタンスリスト通知

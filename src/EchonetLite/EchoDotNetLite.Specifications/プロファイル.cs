@@ -16,9 +16,9 @@ namespace EchoDotNetLite.Specifications
         /// <summary>
         /// クラス一覧
         /// </summary>
-        public static IEnumerable<IEchonetObject> クラス一覧 = new List<IEchonetObject>()
-        {
+        public static IEnumerable<IEchonetObject> クラス一覧 =
+        [
             ノードプロファイル,
-        };
+        ];
     }
 }

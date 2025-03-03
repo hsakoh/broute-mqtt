@@ -1,9 +1,8 @@
-﻿using System;
+﻿using EchoDotNetLite.Common;
+using EchoDotNetLite.Specifications;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using EchoDotNetLite.Common;
-using EchoDotNetLite.Specifications;
 
 namespace EchoDotNetLite.Models
 {
@@ -11,7 +10,7 @@ namespace EchoDotNetLite.Models
     /// <summary>
     /// ECHONET Lite オブジェクトインスタンス
     /// </summary>
-    public class EchoObjectInstance: INotifyCollectionChanged<EchoPropertyInstance>
+    public class EchoObjectInstance : INotifyCollectionChanged<EchoPropertyInstance>
     {
         /// <summary>
         /// デフォルトコンストラクタ
@@ -43,11 +42,11 @@ namespace EchoDotNetLite.Models
         /// </summary>
         /// <param name="classObject">オブジェクトクラス</param>
         /// <param name="instanceCode"></param>
-        public EchoObjectInstance(IEchonetObject classObject,byte instanceCode)
+        public EchoObjectInstance(IEchonetObject classObject, byte instanceCode)
         {
             Spec = classObject;
             InstanceCode = instanceCode;
-            Properties = new NotifyChangeCollection<EchoObjectInstance,EchoPropertyInstance>(this);
+            Properties = new NotifyChangeCollection<EchoObjectInstance, EchoPropertyInstance>(this);
             foreach (var prop in classObject.GetProperties)
             {
                 Properties.Add(new EchoPropertyInstance(prop));

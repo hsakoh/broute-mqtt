@@ -1,6 +1,5 @@
 ﻿namespace SkstackIpDotNet.Responses
 {
-
     /// <summary>
     /// SKSREGのレスポンスクラス
     /// </summary>

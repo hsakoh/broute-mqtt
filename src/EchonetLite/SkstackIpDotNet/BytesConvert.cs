@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace SkstackIpDotNet
@@ -20,7 +19,7 @@ namespace SkstackIpDotNet
             {
                 return string.Empty;
             }
-            StringBuilder sb = new StringBuilder(bytes.Length * 2);
+            StringBuilder sb = new(bytes.Length * 2);
             foreach (byte b in bytes)
             {
                 if (b < 16) sb.Append('0'); // 二桁になるよう0を追加

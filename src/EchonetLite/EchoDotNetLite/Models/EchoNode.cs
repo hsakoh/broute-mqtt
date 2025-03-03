@@ -1,26 +1,24 @@
 ﻿using EchoDotNetLite.Common;
 using EchoDotNetLite.Specifications;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace EchoDotNetLite.Models
 {
     /// <summary>
     /// ECHONET Liteノード
     /// </summary>
-    public class EchoNode: INotifyCollectionChanged<EchoObjectInstance>
+    public class EchoNode : INotifyCollectionChanged<EchoObjectInstance>
     {
         public EchoNode()
         {
-            Devices = new NotifyChangeCollection<EchoNode,EchoObjectInstance>(this);
+            Devices = new NotifyChangeCollection<EchoNode, EchoObjectInstance>(this);
         }
         /// <summary>
         /// 下位スタックのアドレス
         /// </summary>
-        public string Address { get; set;}
+        public string Address { get; set; }
 
         /// <summary>
         /// ノードプロファイルオブジェクト
@@ -30,7 +28,7 @@ namespace EchoDotNetLite.Models
         /// <summary>
         /// 機器オブジェクトのリスト
         /// </summary>
-        public ICollection<EchoObjectInstance> Devices { get;  }
+        public ICollection<EchoObjectInstance> Devices { get; }
 
         /// <summary>
         /// イベント オブジェクトインスタンス増減通知
@@ -52,7 +50,7 @@ namespace EchoDotNetLite.Models
             if (@class != null)
             {
                 Specifications.EchoProperty property;
-                 property = @class.AnnoProperties.Where(p => p.Code == epc).FirstOrDefault();
+                property = @class.AnnoProperties.Where(p => p.Code == epc).FirstOrDefault();
                 if (property != null)
                 {
                     return property;
@@ -80,7 +78,7 @@ namespace EchoDotNetLite.Models
                     ClassGroupCode = classGroupCode,
                     ClassGroupName = "Unknown",
                     ClassGroupNameOfficial = "Unknown",
-                    ClassList = new List<EchoClass>(),
+                    ClassList = [],
                     SuperClass = null,
                 },
                 Class = new EchoClass()
@@ -97,11 +95,11 @@ namespace EchoDotNetLite.Models
             public EchoClassGroup ClassGroup { get; set; }
             public EchoClass Class { get; set; }
 
-            public IEnumerable<EchoProperty> GetProperties => new EchoProperty[] { };
+            public IEnumerable<EchoProperty> GetProperties => [];
 
-            public IEnumerable<EchoProperty> SetProperties => new EchoProperty[] { };
+            public IEnumerable<EchoProperty> SetProperties => [];
 
-            public IEnumerable<EchoProperty> AnnoProperties => new EchoProperty[] { };
+            public IEnumerable<EchoProperty> AnnoProperties => [];
         }
 
         public static Specifications.IEchonetObject FindClass(byte classGroupCode, byte classCode)

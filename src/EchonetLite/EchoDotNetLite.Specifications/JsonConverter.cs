@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EchoDotNetLite.Specifications
 {
@@ -19,9 +17,9 @@ namespace EchoDotNetLite.Specifications
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (!(reader.Value is string str) || !str.StartsWith("0x"))
+            if (reader.Value is not string str || !str.StartsWith("0x"))
                 throw new JsonSerializationException();
-            return Convert.ToByte(str,16);
+            return Convert.ToByte(str, 16);
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EchoDotNetLite
@@ -8,8 +6,8 @@ namespace EchoDotNetLite
 
     public interface IPANAClient
     {
-        Task RequestAsync(string address,byte[] request);
+        Task RequestAsync(string address, byte[] request);
 
-        event EventHandler<(string,byte[])> OnEventReceived;
+        event EventHandler<(string, byte[])> OnEventReceived;
     }
 }
