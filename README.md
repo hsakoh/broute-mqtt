@@ -32,7 +32,6 @@ HA-OSの搭載された機器に接続可能な、Wi-SUN USBスティックが�
 Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が異なる可能性があります。
       * ※1 「ラトックシステム [RS-WSUHA-P](https://www.ratocsystems.com/products/wisun/usb-wisun/rs-wsuha/)」,「テセラ・テクノロジー [RL7023 Stick-D/DSS](https://www.tessera.co.jp/product/rfmodul/rl7023stick-d_dss.html)」や「ROHM [BP35C0](https://www.rohm.co.jp/products/wireless-communication/specified-low-power-radio-modules/bp35c0-product)」,「ROHM BP35C2」
       * ※2 「ラトックシステム [RS-WSUHA-J11](https://www.ratocsystems.com/products/wisun/usb-wisun/rs-wsuha/)」,「ROHM [BP35C1-J11](https://www.rohm.co.jp/products/wireless-communication/specified-low-power-radio-modules/bp35c0-j11-product)、[BP35C2-J11-T01](https://www.rohm.co.jp/products/wireless-communication/specified-low-power-radio-modules/bp35c0-j11-product)」
-      * 内部ライブラリ`SkstackIpDotNet`,`EchoDotNetLiteSkstackIpBridge`の実装を少し修正すればいけるはず
    * その他参考情報
        * [Wi-SUNモジュール - Wi-SUNモジュール製品一覧 | ローム株式会社 - ROHM Semiconductor](https://www.rohm.co.jp/products/wireless-communication/specified-low-power-radio-modules#anc-01)
        * [ローム Wi-SUN対応無線モジュール｜チップワンストップ - 電子部品・半導体の通販サイト](https://www.chip1stop.com/sp/products/rohm_wi-sun-module)
@@ -62,6 +61,7 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 |BRoute:Id|-|配送電会社から提供される<br>Bルートの認証IDを指定します<br>通常は32文字の英数字です|
 |BRoute:Pw|-|Bルートの認証パスワードを指定します<br>通常は12文字の英数字です|
 |BRoute:SerialPort|`/dev/ttyUSB0`|HAOSで識別される<br>Wi-SUN USBスティックのシリアルポートを指定します|
+|BRoute:UseBP35C0Commands: |`false`|使用するコマンド体系を切り替えます。SKSTACK-IP(Single-hop Edition)(RL7023 Stick-D/IPS,ROAM BP35A1等)の場合、`False`<br>RL7023 Stick-D/DSS,RS-WSUHA-P、ROHM BP35C2等の場合、`true`(**実験的**)|
 |BRoute:ForcePANScan|`false`|PANスキャンを起動時に強制する場合、`true`を指定します<br>`false`の場合、過去の接続時のPANを参照する為、再起動時等で再接続が早くなります|
 |BRoute:PanDescSavePath|`/data/EPANDESC.json`|PANの情報を保存する先を指定します|
 |BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
