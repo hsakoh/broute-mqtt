@@ -3,14 +3,11 @@
     /// <summary>
     /// TABLEコマンドのレスポンス基底クラス
     /// </summary>
-    public class BaseTableResponse : ReceiveData
+    /// <remarks>
+    /// コンストラクタ
+    /// </remarks>
+    /// <param name="response"></param>
+    public class BaseTableResponse(string response) : ReceiveData(response)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="response"></param>
-        public BaseTableResponse(string response) : base(response)
-        {
-        }
     }
 }

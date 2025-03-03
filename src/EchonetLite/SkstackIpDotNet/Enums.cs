@@ -67,4 +67,19 @@
         /// </summary>
         SecOrPlain = '2',
     }
+
+    /// <summary>
+    /// MAC 面
+    /// </summary>
+    public enum Side
+    {
+        /// <summary>
+        /// 0: : B 面（B ルート側）へ送信
+        /// </summary>
+        SideB = '0',
+        /// <summary>
+        /// 1: HAN 面（HAN 側）へ送信
+        /// </summary>
+        SideHAN = '1',
+    }
 }

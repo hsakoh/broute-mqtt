@@ -7,13 +7,8 @@ using System.Threading.Tasks;
 namespace SkstackIpDotNet.Commands
 {
 
-    internal abstract class AbstractSKCommand<TResponse> where TResponse : class
+    internal abstract class AbstractSKCommand<TResponse>(string command, int timeout = 5000) where TResponse : class
     {
-        public AbstractSKCommand(string command, int timeout = 5000)
-        {
-            Command = command;
-            Timeout = timeout;
-        }
         internal TaskCompletionSource<TResponse> TaskCompletionSource { get; set; }
         public virtual void ReceiveHandler(object sendor, string eventRow)
         {
@@ -27,23 +22,21 @@ namespace SkstackIpDotNet.Commands
         internal bool HasEchoback { get; set; } = false;
         internal string EchobackCommand { get; private set; } = null;
         internal virtual byte[] Arguments { get; private set; } = null;
-        internal virtual int Timeout { get; private set; }
-        internal string Command { get; private set; }
+        internal virtual int Timeout { get; private set; } = timeout;
+        internal string Command { get; private set; } = command;
 
         internal virtual byte[] GetCommandWithArgument()
         {
-            using (var ms = new MemoryStream())
-            using (var bw = new BinaryWriter(ms))
+            using var ms = new MemoryStream();
+            using var bw = new BinaryWriter(ms);
+            bw.Write(Encoding.ASCII.GetBytes(Command));
+            if (Arguments != null)
             {
-                bw.Write(Encoding.ASCII.GetBytes(Command));
-                if (Arguments != null)
-                {
-                    bw.Write(Encoding.ASCII.GetBytes(" "));
-                    bw.Write(Arguments);
-                }
-                bw.Write(Encoding.ASCII.GetBytes("\r\n"));
-                return ms.ToArray();
+                bw.Write(Encoding.ASCII.GetBytes(" "));
+                bw.Write(Arguments);
             }
+            bw.Write(Encoding.ASCII.GetBytes("\r\n"));
+            return ms.ToArray();
         }
 
         internal virtual string GetCommandLogString()
@@ -51,12 +44,8 @@ namespace SkstackIpDotNet.Commands
             return Encoding.ASCII.GetString(GetCommandWithArgument());
         }
     }
-    internal class SimpleCommand : AbstractSKCommand<OKorFAIL>
+    internal class SimpleCommand(string command, int timeout = 2000) : AbstractSKCommand<OKorFAIL>(command, timeout)
     {
-        public SimpleCommand(string command, int timeout = 2000) : base(command, timeout)
-        {
-
-        }
         public override void ReceiveHandler(object sendor, string eventRow)
         {
             base.ReceiveHandler(sendor, eventRow);

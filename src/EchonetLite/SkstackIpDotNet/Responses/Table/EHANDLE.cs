@@ -32,7 +32,7 @@ namespace SkstackIpDotNet.Responses
         /// <summary>
         /// TCP ハンドル状態一覧
         /// </summary>
-        public List<TcpHandleState> List = new List<TcpHandleState>();
+        public List<TcpHandleState> List = [];
 
         /// <summary>
         /// TCP ハンドル状態

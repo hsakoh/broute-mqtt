@@ -13,8 +13,8 @@ namespace EchoDotNetLiteSkstackIpBridge
     public class SkstackIpPANAClient : IPANAClient, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly SKDevice SKDevice;
-        public SkstackIpPANAClient(ILogger<SkstackIpPANAClient> logger, SKDevice skDevice)
+        private readonly ISKDevice SKDevice;
+        public SkstackIpPANAClient(ILogger<SkstackIpPANAClient> logger, ISKDevice skDevice)
         {
             _logger = logger;
             SKDevice = skDevice;

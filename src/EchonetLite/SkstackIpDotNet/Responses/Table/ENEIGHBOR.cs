@@ -33,7 +33,7 @@ namespace SkstackIpDotNet.Responses
         /// <summary>
         /// 自端末のネイバーキャッシュ内の IPv6 エントリー一覧
         /// </summary>
-        public List<NaighborCache> List = new List<NaighborCache>();
+        public List<NaighborCache> List = [];
 
         /// <summary>
         /// 自端末のネイバーキャッシュ内の IPv6 エントリー

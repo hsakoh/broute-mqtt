@@ -28,7 +28,7 @@ namespace SkstackIpDotNet.Responses
         /// <summary>
         /// 自端末で利用可能な IPv6 アドレス一覧
         /// </summary>
-        public List<Addr> List = new List<Addr>();
+        public List<Addr> List = [];
 
         /// <summary>
         /// 自端末で利用可能な IPv6 アドレス

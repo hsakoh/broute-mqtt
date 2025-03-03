@@ -9,15 +9,12 @@ namespace SkstackIpDotNet.Responses
     /// MAC セキィリティのキー設定表示
     /// TODO SKSTACK-IP(Single-hop Edition)に記述が無いが、応答するのでそのままとする
     /// </summary>
-    public class ESEC : BaseTableResponse
+    /// <remarks>
+    /// コンストラクタ 
+    /// </remarks>
+    /// <param name="response"></param>
+    public class ESEC(string response) : BaseTableResponse(response)
     {
-        /// <summary>
-        /// コンストラクタ 
-        /// </summary>
-        /// <param name="response"></param>
-        public ESEC(string response) : base(response)
-        {
-        }
         //TODO 未実装
     }
 }

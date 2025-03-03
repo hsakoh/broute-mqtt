@@ -8,6 +8,8 @@ public class BRouteOptions
 
     public string SerialPort { get; set; } = default!;
 
+    public bool UseBP35C0Commands { get; set; } = false;
+
     public bool ForcePANScan { get; set; } = false;
     public string PanDescSavePath { get; set; } = "/data/EPANDESC.json";
 

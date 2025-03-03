@@ -3,40 +3,31 @@
     /// <summary>
     /// OKorFAILレスポンス
     /// </summary>
-    public abstract class OKorFAIL : ReceiveData
+    /// <remarks>
+    /// コンストラクタ
+    /// </remarks>
+    /// <param name="response"></param>
+    public abstract class OKorFAIL(string response) : ReceiveData(response)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="response"></param>
-        public OKorFAIL(string response) : base(response)
-        {
-        }
     }
     /// <summary>
     /// OKレスポンス
     /// </summary>
-    public class OK : OKorFAIL
+    /// <remarks>
+    /// コンストラクタ
+    /// </remarks>
+    /// <param name="response"></param>
+    public class OK(string response) : OKorFAIL(response)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="response"></param>
-        public OK(string response) : base(response)
-        {
-        }
     }
     /// <summary>
     /// FAILレスポンス
     /// </summary>
-    public class FAIL : OKorFAIL
+    /// <remarks>
+    /// コンストラクタ
+    /// </remarks>
+    /// <param name="response"></param>
+    public class FAIL(string response) : OKorFAIL(response)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="response"></param>
-        public FAIL(string response) : base(response)
-        {
-        }
     }
 }

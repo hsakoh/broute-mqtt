@@ -28,7 +28,7 @@ namespace SkstackIpDotNet.Responses
         /// <summary>
         ///  ED スキャンの実行結果一覧
         /// </summary>
-        public List<ChannelRssi> List = new List<ChannelRssi>();
+        public List<ChannelRssi> List = [];
         /// <summary>
         /// ED スキャンの実行結果
         /// </summary>

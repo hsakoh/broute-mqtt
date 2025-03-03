@@ -9,15 +9,12 @@ namespace SkstackIpDotNet.Responses
     /// ネイバーテーブル一覧
     /// TODO SKSTACK-IP(Single-hop Edition)に記述が無いが、応答するのでそのままとする
     /// </summary>
-    public class ENBR : BaseTableResponse
+    /// <remarks>
+    /// コンストラクタ
+    /// </remarks>
+    /// <param name="response"></param>
+    public class ENBR(string response) : BaseTableResponse(response)
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="response"></param>
-        public ENBR(string response) : base(response)
-        {
-        }
         //TODO 未実装
     }
 }
