@@ -62,7 +62,7 @@ public class Worker(
         await PublishSensorConfigAsync(serial, "instantaneous_current_t", "瞬時電流計測値(T相)", "active"
             , device_class: "current", state_class: "measurement", unit_of_measurement: "A");
         await PublishSensorConfigAsync(serial, "instantaneous_electric_power", "瞬時電力計測値", "active"
-            , device_class: "apparent_power", state_class: "measurement", unit_of_measurement: "W");
+            , device_class: "power", state_class: "measurement", unit_of_measurement: "W");
         await PublishSensorConfigAsync(serial, "active_timestamp", "更新日時(瞬時値)", "active"
             , device_class: "timestamp", value_template: "{% set ts = value_json.get('timestamp', {})  %} {% if ts %}\n  {{ (ts / 1000) | timestamp_local | as_datetime }}\n{% else %}\n  {{ this.state }}\n{% endif %}");
 
