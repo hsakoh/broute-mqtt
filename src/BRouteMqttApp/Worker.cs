@@ -89,6 +89,7 @@ public class Worker(
             value_template = value_template ?? $"{{{{value_json.{type}}}}}",
             unique_id = $"{type}_{serial}",
             object_id = $"{type}_{serial}",
+            default_entity_id = $"sensor.{type}_{serial}",
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
@@ -108,6 +109,7 @@ public class Worker(
             payload_press = type,
             unique_id = $"btn_{type}_{serial}",
             object_id = $"btn_{type}_{serial}",
+            default_entity_id = $"button.{type}_{serial}",
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
