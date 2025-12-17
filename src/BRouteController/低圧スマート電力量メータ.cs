@@ -1,6 +1,6 @@
-﻿using BitConverter;
-using EchoDotNetLite.Models;
+﻿using EchoDotNetLite.Models;
 using EchoDotNetLite.Specifications;
+using System.Buffers.Binary;
 using System.Text;
 
 namespace BRouteController;
@@ -57,7 +57,7 @@ public class 低圧スマート電力量メータ
         {
             return null;
         }
-        var 係数 = EndianBitConverter.BigEndian.ToUInt32(d3, 0);
+        var 係数 = BinaryPrimitives.ReadUInt32BigEndian(d3);
         var 積算電力量単位 = e1 switch
         {
             0x00 => 1m,
@@ -71,7 +71,7 @@ public class 低圧スマート電力量メータ
             0x0D => 10000m,
             _ => throw new InvalidOperationException($"積算電力量単位が不正値:{e1}"),
         };
-        return EndianBitConverter.BigEndian.ToUInt32(prop.Value, 0) * 係数 * 積算電力量単位;
+        return BinaryPrimitives.ReadUInt32BigEndian(prop.Value) * 係数 * 積算電力量単位;
     }
 
     public (long datetime, decimal? kWh)? 定時積算電力量計測値_正方向計測値
@@ -98,7 +98,7 @@ public class 低圧スマート電力量メータ
             return null;
         }
         var ymdhms = prop.Value[0..7];
-        var datetime = new DateTimeOffset(EndianBitConverter.BigEndian.ToInt16(ymdhms, 0), ymdhms[2], ymdhms[3], ymdhms[4], ymdhms[5], ymdhms[6], TimeSpan.FromHours(9)); ;
+        var datetime = new DateTimeOffset(BinaryPrimitives.ReadInt16BigEndian(ymdhms), ymdhms[2], ymdhms[3], ymdhms[4], ymdhms[5], ymdhms[6], TimeSpan.FromHours(9)); ;
         var val = prop.Value[7..11];
         if (val.SequenceEqual(new byte[] { 0xFF, 0xFF, 0xFF, 0xFE }))
         {
@@ -114,7 +114,7 @@ public class 低圧スマート電力量メータ
         {
             return (datetime.ToUnixTimeMilliseconds(), null);
         }
-        var 係数 = EndianBitConverter.BigEndian.ToUInt32(d3, 0);
+        var 係数 = BinaryPrimitives.ReadUInt32BigEndian(d3);
         var 積算電力量単位 = e1 switch
         {
             0x00 => 1m,
@@ -128,7 +128,7 @@ public class 低圧スマート電力量メータ
             0x0D => 10000m,
             _ => throw new InvalidOperationException($"積算電力量単位が不正値:{e1}"),
         };
-        var kWh = EndianBitConverter.BigEndian.ToUInt32(val, 0) * 係数 * 積算電力量単位;
+        var kWh = BinaryPrimitives.ReadUInt32BigEndian(val) * 係数 * 積算電力量単位;
         return (datetime.ToUnixTimeMilliseconds(), kWh);
     }
 
@@ -141,7 +141,7 @@ public class 低圧スマート電力量メータ
             {
                 return null;
             }
-            return EndianBitConverter.BigEndian.ToInt32(prop.Value, 0);
+            return BinaryPrimitives.ReadInt32BigEndian(prop.Value);
         }
     }
 
@@ -154,7 +154,7 @@ public class 低圧スマート電力量メータ
             {
                 return null;
             }
-            return (EndianBitConverter.BigEndian.ToInt16(prop.Value, 0) * 0.1m, EndianBitConverter.BigEndian.ToInt16(prop.Value, 2) * 0.1m);
+            return (BinaryPrimitives.ReadInt16BigEndian(prop.Value) * 0.1m, BinaryPrimitives.ReadInt16BigEndian(prop.Value.AsSpan()[2..]) * 0.1m);
         }
     }
 
@@ -172,7 +172,7 @@ public class 低圧スマート電力量メータ
             {
                 return null;
             }
-            var datetime = new DateTimeOffset(EndianBitConverter.BigEndian.ToInt16(ymd, 0), ymd[2], ymd[3], hm[0], hm[1], 0, TimeSpan.FromHours(9));
+            var datetime = new DateTimeOffset(BinaryPrimitives.ReadInt16BigEndian(ymd), ymd[2], ymd[3], hm[0], hm[1], 0, TimeSpan.FromHours(9));
             return datetime.ToUnixTimeMilliseconds();
         }
     }

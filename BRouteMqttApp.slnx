@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/EchonetLite/">
+    <Project Path="src/EchonetLite/EchoDotNetLite.Specifications/EchoDotNetLite.Specifications.csproj" />
+    <Project Path="src/EchonetLite/EchoDotNetLite/EchoDotNetLite.csproj" />
+    <Project Path="src/EchonetLite/EchoDotNetLiteSkstackIpBridge/EchoDotNetLiteSkstackIpBridge.csproj" />
+    <Project Path="src/EchonetLite/SkstackIpDotNet/SkstackIpDotNet.csproj" />
+  </Folder>
+  <Folder Name="/HomeAssistant/">
+    <Project Path="src/HomeAssistant/HomeAssistantAddOn.Core/HomeAssistantAddOn.Core.csproj" />
+    <Project Path="src/HomeAssistant/HomeAssistantAddOn.Mqtt/HomeAssistantAddOn.Mqtt.csproj" />
+  </Folder>
+  <Folder Name="/ソリューション項目/">
+    <File Path="Dockerfile" />
+  </Folder>
+  <Project Path="src/BRouteController/BRouteController.csproj" />
+  <Project Path="src/BRouteMqttApp/BRouteMqttApp.csproj" />
+</Solution>

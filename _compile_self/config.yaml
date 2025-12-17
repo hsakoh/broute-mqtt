@@ -1,6 +1,6 @@
 name: "BRoute-Mqtt"
 description: "Wi-SUNドングル/ECHONETLiteプロトコルを通じて、低圧スマート電力量メータをHome AssistantのMQTTにデバイス/センサーとして統合するアドオン"
-version: "1.0.9"
+version: "1.0.10"
 slug: "broute_mqtt"
 url: "https://github.com/hsakoh/broutemqtt-mqtt"
 startup: application
