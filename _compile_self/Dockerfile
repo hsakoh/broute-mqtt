@@ -8,4 +8,5 @@ ENV BUILD_ARCH=$BUILD_ARCH
 RUN apk add --upgrade --no-cache bash ca-certificates-bundle libgcc libssl3 libstdc++ icu-libs
     
 COPY /$BUILD_ARCH /app
+ENV DOTNET_GCRegionRange=10000000
 ENTRYPOINT ["/app/BRouteMqttApp"]
