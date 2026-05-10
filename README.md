@@ -39,21 +39,42 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 
 ## 導入方法
 
-3種類の方法があります
+### 手順 1: Mosquitto MQTT ブローカーのインストール
 
-1. GitHub ContainerRegistoryに登録されたDockerイメージを参照する
-    1. [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhsakoh%2Fha-addon)
-        1. ホーム アシスタント UI でアドオン ストアに移動します (左側のメニューで[スーパーバイザー]、上部タブで[アドオン ストア] )
-        1. 右上隅にある 3 つの縦のドットを選択し、リポジトリを選択します
-        1. 「アドオン リポジトリの管理」画面で、`https://github.com/hsakoh/ha-addon` を入力し、「追加」をクリックします。
-        1. リポジトリを追加した後、アドオンのリストの一番下までスクロールするか、検索を使用してアドオンを見つけます
-    1. アドオンを選択し、「インストール」をクリックします
-1. 事前に.NETアプリをコンパイルと発行したうえで、HAOS上でDockerイメージをビルドする
-    1. リポジトリのルートで`./_compile_self/dotnet_publish.ps1`を実行してください。
-    1. `_compile_self`フォルダの中身一式を HA-OSの`/addons/broute-mqtt`に配置します
-1. HA-OS上でDockerイメージをビルドする際に、.NETアプリもコンパイルして発行する
-    1. `src`フォルダ と `_build_on_haos`フォルダの中身一式を HA-OSの`/addons/broute-mqtt`に配置します
-    1. HA-OS搭載のマシンが非力な場合、ビルド(インストール)に非常に時間がかかります。<br>その間HA-OSが停止しているように見える場合があります。(RasPi3B+で30分等)**推奨しません。**
+本アドオンはスマートメーターの情報を Home Assistant の [MQTT 統合](https://www.home-assistant.io/integrations/mqtt/)へ送信します。  
+まず MQTT ブローカーをインストールしてください。
+
+推奨は [Mosquitto MQTT broker アドオン](https://github.com/home-assistant/addons/blob/master/mosquitto/DOCS.md) を使用する方法です。
+
+### 手順 2: MQTT 統合の構成
+
+[こちらのページ](https://www.home-assistant.io/integrations/mqtt/#broker-configuration) の手順に従い、MQTT 統合がどのブローカーと連携するかを設定してください。
+
+### 手順 3: アドオンのインストール
+
+アドオンのインストール方法は 3 種類あります。
+
+#### 3-1. GitHub Container Registry に登録された Docker イメージを参照する（推奨）
+
+[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fhsakoh%2Fha-addon)
+
+上のボタンが機能しない場合は、以下の手順でリポジトリを追加してください。
+
+1. ホームアシスタント UI でアドオンストアに移動します（左側のメニューで「スーパーバイザー」、上部タブで「アドオンストア」）
+2. 右上隅にある 3 つの縦のドットを選択し、「リポジトリ」を選択します
+3. 「アドオンリポジトリの管理」画面で `https://github.com/hsakoh/ha-addon` を入力し、「追加」をクリックします
+4. リストの一番下までスクロールするか、検索を使用してアドオンを見つけます
+5. アドオンを選択し、「インストール」をクリックします
+
+#### 3-2. 事前に .NET アプリをコンパイル・発行してから HAOS 上で Docker イメージをビルドする
+
+1. リポジトリのルートで `./_compile_self/dotnet_publish.ps1` を実行します
+2. `_compile_self` フォルダの中身一式を HA-OS の `/addons/broute-mqtt` に配置します
+
+#### 3-3. HA-OS 上で Docker イメージをビルドする際に .NET アプリもコンパイル・発行する
+
+1. `src` フォルダと `_build_on_haos` フォルダの中身一式を HA-OS の `/addons/broute-mqtt` に配置します
+2. HA-OS 搭載のマシンが非力な場合、ビルド（インストール）に非常に時間がかかります。その間 HA-OS が停止しているように見える場合があります（RasPi3B+ で 30 分等）。**推奨しません。**
 
 ## 設定項目
 |設定キー|既定値|説明|
