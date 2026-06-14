@@ -1,5 +1,5 @@
 # ホームアシスタント アドオン BRoute-Mqtt
-低圧スマート電力量メータをHoma AssistantのMQTT統合にデバイス/センサーとして統合するアドオン
+低圧スマート電力量メータをHome AssistantのMQTT統合にデバイス/センサーとして統合するアドオン
 
 ECHONET Liteプロトコル(Bルート)を経由して情報を取得する為、<br>
 HA-OSの搭載された機器に接続可能な、Wi-SUN USBスティックが必要です
@@ -36,6 +36,25 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
        * [Wi-SUNモジュール - Wi-SUNモジュール製品一覧 | ローム株式会社 - ROHM Semiconductor](https://www.rohm.co.jp/products/wireless-communication/specified-low-power-radio-modules#anc-01)
        * [ローム Wi-SUN対応無線モジュール｜チップワンストップ - 電子部品・半導体の通販サイト](https://www.chip1stop.com/sp/products/rohm_wi-sun-module)
        * [Bルートやってみた - Skyley Official Wiki](https://www.skyley.com/wiki/index.php?B%E3%83%AB%E3%83%BC%E3%83%88%E3%82%84%E3%81%A3%E3%81%A6%E3%81%BF%E3%81%9F)
+
+> [!IMPORTANT]
+> **BP35C2(RS-WSUHA-P 等)をご利用の場合は、事前に `WOPT 01` の設定が必要です**
+>
+> BP35C2は、初期設定ではデータ部の出力が**バイナリ形式**になっており、<br>
+> `BRoute:UseBP35C0Commands: true` を指定しても、そのままでは正しく接続・通信できません。
+>
+> 事前にシリアルターミナル（Windowsなら[Tera Term](https://teratermproject.github.io/)等）で<br>
+> ボーレート`115200`でモジュールに接続し、以下のコマンドを実行して<br>
+> データ部の出力を**16進ASCII形式**に変更してください。
+>
+> ```
+> ROPT       ← 現在の設定を確認 (例: OK 00 ならバイナリ形式)
+> WOPT 01    ← 16進ASCII形式に変更 (OK が返る)
+> ```
+>
+> この設定はモジュールの不揮発メモリに書き込まれる為、**初回のみ**実施すればOKです。
+>
+> 参考: [#6](https://github.com/hsakoh/broute-mqtt/issues/6) , [legnoh/smartmeter-exporter](https://github.com/legnoh/smartmeter-exporter)
 
 ## 導入方法
 
@@ -82,7 +101,7 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 |BRoute:Id|-|配送電会社から提供される<br>Bルートの認証IDを指定します<br>通常は32文字の英数字です|
 |BRoute:Pw|-|Bルートの認証パスワードを指定します<br>通常は12文字の英数字です|
 |BRoute:SerialPort|`/dev/ttyUSB0`|HAOSで識別される<br>Wi-SUN USBスティックのシリアルポートを指定します|
-|BRoute:UseBP35C0Commands: |`false`|使用するコマンド体系を切り替えます。SKSTACK-IP(Single-hop Edition)(RL7023 Stick-D/IPS,ROAM BP35A1等)の場合、`False`<br>RL7023 Stick-D/DSS,RS-WSUHA-P、ROHM BP35C2等の場合、`true`(**実験的**)|
+|BRoute:UseBP35C0Commands |`false`|使用するコマンド体系を切り替えます。SKSTACK-IP(Single-hop Edition)(RL7023 Stick-D/IPS,ROHM BP35A1等)の場合、`False`<br>RL7023 Stick-D/DSS,RS-WSUHA-P、ROHM BP35C2等の場合、`true`(**実験的**)<br>※BP35C2(RS-WSUHA-P等)は事前に`WOPT 01`の設定が必要です。[前提条件](#前提条件)を参照してください|
 |BRoute:ForcePANScan|`false`|PANスキャンを起動時に強制する場合、`true`を指定します<br>`false`の場合、過去の接続時のPANを参照する為、再起動時等で再接続が早くなります|
 |BRoute:PanDescSavePath|`/data/EPANDESC.json`|PANの情報を保存する先を指定します|
 |BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
