@@ -15,14 +15,51 @@ HA-OSの搭載された機器に接続可能な、Wi-SUN USBスティックが�
   * 起動時/手動での要求時/30分毎の定期通知の受信
     * 積算電力量計測値(逆方向) kWh
     * 積算電力量計測値(正方向) kWh
+  * 起動時/手動での要求時(第2世代スマートメーターのみ)
+    * 1分積算電力量計測値(正方向/逆方向) kWh
   * 起動時(定性情報)
     * メーカコード
     * 規格Version情報
     * 製造番号
     * 設置場所
-* 積算電力量、瞬時値それぞれを即時取得するボタンを提供します([MQTT Button - Home Assistant](https://www.home-assistant.io/integrations/button.mqtt/))
+    * Bルート識別番号(第2世代スマートメーターのみ)
+* 積算電力量、瞬時値、1分積算電力量(第2世代のみ)それぞれを即時取得するボタンを提供します([MQTT Button - Home Assistant](https://www.home-assistant.io/integrations/button.mqtt/))
+* ECHONET Lite Appendix Release R(rev.4) のプロパティ定義に対応しています
+  * 第2世代スマートメーター固有の項目(1分積算電力量・Bルート識別番号)は、メーターの Get プロパティマップに存在する場合のみエンティティが作成されます
+* 1つの Wi-SUN ドングルで複数のメーターを巡回取得する「複数モード」に対応しています([動作モード](#動作モード)を参照)
 
 ![MQTT統合のデバイス画面](_images/02.png)
+
+## 動作モード
+
+### 単体モード(従来動作)
+`BRoute:Id`/`BRoute:Pw` を設定した場合の動作です。<br>
+単一のメーターと常時 PANA セッションを維持し、瞬時値を周期取得しつつ、30分毎の定時積算電力量の通知(INF)を受信します。<br>
+セッションが失われた場合(EVENT 0x26/0x29 等)は、次回ポーリング時に自動で再接続します。
+
+### 複数モード(巡回ポーリング)
+`BRoute:Id`/`BRoute:Pw` を空にして、`BRoute:Meters` に1件以上のメーターを設定した場合の動作です。<br>
+Wi-SUN の Bルートは 1 ドングルにつき同時に 1 つの PANA セッションしか確立できないため、<br>
+メーター毎に 接続→取得→切断(SKTERM) を繰り返して巡回します。
+
+* `BRoute:Id`/`Pw` と `BRoute:Meters` の両方に値がある場合は、**単体モードとして動作**します(`Meters` は無視されます)
+* 通知(INF)には依存せず、積算電力量は毎巡回で定時積算電力量(0xEA/0xEB : 30分毎の確定値)を読み出して更新します
+* PAN スキャン結果はメーター毎に `EPANDESC.{BルートID下8桁}.json` として保存し、<br>2巡目以降は SKSCAN を省略して高速に切り替えます(キャッシュでの接続失敗時は自動で再スキャンします)
+* ボタン(瞬時値/積算電力量/1分積算電力量)の押下は、そのメーターへの**次回訪問時**に実行されます
+* HA 上のデバイス/エンティティは、巡回でメーターが検出され次第、順次現れます
+* 目安時間: 1メーターあたり約15〜20秒(初回訪問はプロパティマップ取得等で +20〜40秒)。<br>
+  `InstantaneousValueInterval`(既定 `00:01:10`)は**巡回の開始間隔**として扱われ、1巡がこれを超える場合は連続で巡回します。<br>
+  瞬時値の更新頻度が巡回周期に律速される為、実用上は2台程度までを推奨します
+
+## broute-wifi-mqtt との同時稼働
+
+同一メーターを [broute-wifi-mqtt](https://github.com/hsakoh/broute-wifi-mqtt)(Wi-Fi 方式)と本アドオンの両方から参照すると、<br>
+MQTT Discovery の `unique_id` / `device.identifiers` が同一になるため、HA 上でエンティティを取り合い状態が不安定になります。<br>
+`BRoute:AddWiSunSuffix: true` を設定すると、本アドオン側の識別子(トピック/unique_id/device.identifiers)に `_wisun` サフィックスが付与され、別デバイスとして安定して共存できます。
+
+> [!NOTE]
+> `AddWiSunSuffix` を後から `true` へ切り替えると、HA 上は**別エンティティとして新規作成**されます(履歴は引き継がれません)。<br>
+> 旧エンティティが不要な場合は、retain された discovery config への空ペイロード送信、または HA 上での手動削除が必要です。
 
 ## 前提条件
 * スカイリー・ネットワークス SKSTACK-IP(Single-hop Edition) に対応した動作をする実装となっています
@@ -98,22 +135,26 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 ## 設定項目
 |設定キー|既定値|説明|
 |--|--|--|
-|BRoute:Id|-|配送電会社から提供される<br>Bルートの認証IDを指定します<br>通常は32文字の英数字です|
+|BRoute:Id|-|配送電会社から提供される<br>Bルートの認証IDを指定します<br>通常は32文字の英数字です<br>設定すると単体モードで動作します|
 |BRoute:Pw|-|Bルートの認証パスワードを指定します<br>通常は12文字の英数字です|
+|BRoute:Meters|`[]`|複数モードで巡回するメーターの認証情報リストを指定します<br>`- Id: xxxx`<br>`  Pw: yyyy`<br>の配列で記述します<br>`BRoute:Id`/`Pw` が設定されている場合は無視されます(単体モード優先)|
 |BRoute:SerialPort|`/dev/ttyUSB0`|HAOSで識別される<br>Wi-SUN USBスティックのシリアルポートを指定します|
 |BRoute:UseBP35C0Commands |`false`|使用するコマンド体系を切り替えます。SKSTACK-IP(Single-hop Edition)(RL7023 Stick-D/IPS,ROHM BP35A1等)の場合、`False`<br>RL7023 Stick-D/DSS,RS-WSUHA-P、ROHM BP35C2等の場合、`true`(**実験的**)<br>※BP35C2(RS-WSUHA-P等)は事前に`WOPT 01`の設定が必要です。[前提条件](#前提条件)を参照してください|
 |BRoute:ForcePANScan|`false`|PANスキャンを起動時に強制する場合、`true`を指定します<br>`false`の場合、過去の接続時のPANを参照する為、再起動時等で再接続が早くなります|
 |BRoute:PanDescSavePath|`/data/EPANDESC.json`|PANの情報を保存する先を指定します|
-|BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
+|BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>複数モードでは巡回の開始間隔として扱われます<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PanScanMaxRetryAttempts|`3`|PANスキャンの最大再試行回数を指定します|
 |BRoute:PanScanRetryDelay|`00:01:00`|PANスキャンの再試行間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PanaConnectTimeout|`00:00:30`|PANA接続のタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PanaConnectMaxRetryAttempts|`3`|PANA接続の最大再試行回数を指定します|
 |BRoute:PanaConnectRetryDelay|`00:01:00`|PANA接続の再試行間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
+|BRoute:SkTermTimeout|`00:00:10`|複数モードでのセッション切断(SKTERM)の完了待ちタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PropertyReadTimeout|`00:00:05`|プロパティ値読み出しのタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PropertyReadMaxRetryAttempts|`3`|プロパティ値読み出しの最大再試行回数を指定します|
 |BRoute:PropertyReadRetryDelay|`00:00:05`|プロパティ値読み出しの再試行間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
+|BRoute:PropertyReadIntervalDelay|`00:00:02`|プロパティ値読み出しの要求間ウェイト(メーター保護)を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:ContinuePollingOnError|`true`|ポーリングでタイムアウト等エラー発生時、アドオンの処理を継続する場合、`true`を指定します|
+|BRoute:AddWiSunSuffix|`false`|broute-wifi-mqtt と同一メーターを同時参照する場合に、MQTT識別子へ `_wisun` サフィックスを付与します<br>[broute-wifi-mqtt との同時稼働](#broute-wifi-mqtt-との同時稼働)を参照してください|
 |Mqtt:AutoConfig|true|デフォルトのHome Assistant Mosquitto統合を使用しているアドオンユーザーは、Home Assistant Supervisor APIを介して接続の詳細を検出できるため、この値をTrueに設定できます。|
 |Mqtt:Host|-|MQTTブローカー<br>ホスト名を指定します|
 |Mqtt:Port|`1883`|ポート番号を指定します|
