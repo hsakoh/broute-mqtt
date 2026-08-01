@@ -85,7 +85,15 @@ public class BRouteControllerService : IDisposable
         public string? Serial { get; set; }
         public int ConsecutiveFailures { get; set; }
         public int SkipRemaining { get; set; }
+        /// <summary>PAN未発見のため、この起動中は巡回対象から除外(再試行は再起動時)</summary>
+        public bool Excluded { get; set; }
     }
+
+    /// <summary>PANスキャンをリトライしても対象のPANが見つからなかった</summary>
+    private sealed class PanNotFoundException(string message) : ApplicationException(message);
+
+    /// <summary>接続後のメーター初期化(プロパティマップ読み込み)がタイムアウトした</summary>
+    private sealed class MeterInitializeTimeoutException(string message) : ApplicationException(message);
 
     public async Task InitalizeAsync(CancellationToken ct)
     {
@@ -223,6 +231,10 @@ public class BRouteControllerService : IDisposable
             foreach (var state in _meterStates)
             {
                 ct.ThrowIfCancellationRequested();
+                if (state.Excluded)
+                {
+                    continue;
+                }
                 if (state.SkipRemaining > 0)
                 {
                     state.SkipRemaining--;
@@ -244,6 +256,13 @@ public class BRouteControllerService : IDisposable
                     state.ConsecutiveFailures++;
                     state.SkipRemaining = Math.Min(state.ConsecutiveFailures - 1, MaxPollSkipCycles);
                     _logger.LogError(ex, "PairingID:{PairId} の巡回で例外(連続{Failures}回目)", state.PairId, state.ConsecutiveFailures);
+                    //一度も接続できないままPANが見つからないメーターは圏外とみなし、
+                    //スキャンの繰り返しで巡回全体を停滞させないよう、この起動中は除外する
+                    if (ex is PanNotFoundException && !state.DiscoveryCompleted)
+                    {
+                        state.Excluded = true;
+                        _logger.LogWarning("PairingID:{PairId} はPANが見つからないため、この起動中は巡回対象から除外します(再試行するには再起動してください)", state.PairId);
+                    }
                     if (!_optionsMonitor.CurrentValue.ContinuePollingOnError)
                     {
                         throw;
@@ -279,7 +298,24 @@ public class BRouteControllerService : IDisposable
         }
         try
         {
-            var (node, device) = await EnsureMeterInitializedAsync(state, ct);
+            (EchoNode node, EchoObjectInstance device) initialized;
+            try
+            {
+                initialized = await EnsureMeterInitializedAsync(state, ct);
+            }
+            catch (MeterInitializeTimeoutException)
+            {
+                //接続直後に ECHONET Lite の応答だけが得られないセッションになることがあるため、
+                //セッションを張り直して同一訪問内でもう一度だけ初期化を試す
+                _logger.LogWarning("初期化がタイムアウトしたため、セッションを再確立して再試行します(PairingID:{PairId})", state.PairId);
+                await _skStackClient.TerminateAsync((int)options.SkTermTimeout.TotalMilliseconds);
+                if (!await _skStackClient.JoinAsync(epandesc, (int)options.PanaConnectTimeout.TotalMilliseconds))
+                {
+                    throw new ApplicationException($"PANA接続に失敗(PairingID:{state.PairId})");
+                }
+                initialized = await EnsureMeterInitializedAsync(state, ct);
+            }
+            var (node, device) = initialized;
 
             await _semaphore.WaitAsync(ct);
             try
@@ -347,7 +383,7 @@ public class BRouteControllerService : IDisposable
         }
         if (epandesc == null)
         {
-            throw new ApplicationException($"PANスキャン リトライオーバー(PairingID:{state.PairId})");
+            throw new PanNotFoundException($"PANスキャン リトライオーバー(PairingID:{state.PairId})");
         }
         Directory.CreateDirectory(Path.GetDirectoryName(state.PanCachePath)!);
         await File.WriteAllTextAsync(state.PanCachePath,
@@ -400,7 +436,7 @@ public class BRouteControllerService : IDisposable
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new ApplicationException($"プロパティマップ読み込みがタイムアウトしました(PairingID:{state.PairId})");
+                throw new MeterInitializeTimeoutException($"プロパティマップ読み込みがタイムアウトしました(PairingID:{state.PairId})");
             }
         }
 
