@@ -15,8 +15,8 @@ public class Worker(
     /// broute-wifi-mqtt との同時稼働時に識別子の衝突を避けるためのサフィックス。
     /// トピック/unique_id/device.identifiers に付与する(センサー値としての製造番号には付与しない)
     /// </summary>
-    private string MeterSerial
-        => bRouteControllerService.Meter.製造番号! + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "_wisun" : "");
+    private string GetSerial(低圧スマート電力量メータ meter)
+        => meter.製造番号! + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "_wisun" : "");
 
     private string DeviceName
         => nameof(低圧スマート電力量メータ) + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "(Wi-SUN)" : "");
@@ -26,23 +26,29 @@ public class Worker(
         await mqttService.StartAsync();
         await bRouteControllerService.InitalizeAsync(cancellationToken);
 
-        await PublishDeviceConfigsAsync();
-
-        await Task.Delay(5 * 1000, cancellationToken);
-
-        await PublishDeviceActiveStatusAsync();
-        await PublishDevicePassiveStatusAsync();
-        if (MeterHasEpc(0xD0))
+        if (bRouteControllerService.Mode == BRouteMode.Single)
         {
-            await PublishDevicePassive1MinStatusAsync();
+            var meter = bRouteControllerService.Meter;
+            await PublishDeviceConfigsAsync(meter);
+
+            await Task.Delay(5 * 1000, cancellationToken);
+
+            await PublishDeviceActiveStatusAsync(meter);
+            await PublishDevicePassiveStatusAsync(meter);
+            if (MeterHasEpc(meter, 0xD0))
+            {
+                await PublishDevicePassive1MinStatusAsync(meter);
+            }
+            await PublishDeviceStaticStatusAsync(meter);
+            SubscribeCommandTopic(meter);
         }
-        await PublishDeviceStaticStatusAsync();
-        SubscribeCommandTopic();
 
         bRouteControllerService.ActivePropertiesReadedCallback = PublishDeviceActiveStatusAsync;
         bRouteControllerService.PassivePropertiesReadedCallback = PublishDevicePassiveStatusAsync;
         bRouteControllerService.PassivePropertiesOnTimeCallback = PublishDevicePassiveOnTimeStatusAsync;
         bRouteControllerService.Passive1MinPropertiesReadedCallback = PublishDevicePassive1MinStatusAsync;
+        //複数モード: 巡回でメーターを初回検出したときに discovery を公開する
+        bRouteControllerService.MeterDiscoveredCallback = OnMeterDiscoveredAsync;
 
         await base.StartAsync(cancellationToken);
     }
@@ -57,20 +63,30 @@ public class Worker(
         await base.StopAsync(cancellationToken);
     }
 
-    #region Configure Senser
-    private async Task PublishDeviceConfigsAsync()
+    private async Task OnMeterDiscoveredAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        await PublishDeviceConfigsAsync(meter);
+        //HA が discovery を処理するのを待ってから状態を送る(単体モードの起動シーケンスと同じ5秒)
+        await Task.Delay(5 * 1000);
+        await PublishDeviceStaticStatusAsync(meter);
+        SubscribeCommandTopic(meter);
+        //瞬時値・積算値は直後の巡回内の読み出しでコールバック経由で publish される
+    }
+
+    #region Configure Senser
+    private async Task PublishDeviceConfigsAsync(低圧スマート電力量メータ meter)
+    {
+        var serial = GetSerial(meter);
         await PublishSensorConfigAsync(serial, "placement", "設置場所", "static", icon: "mdi:map-marker");
         await PublishSensorConfigAsync(serial, "version", "規格Version情報", "static", icon: "mdi:information");
         await PublishSensorConfigAsync(serial, "makercode", "メーカコード", "static", icon: "mdi:factory");
         await PublishSensorConfigAsync(serial, "serialnumber", "製造番号", "static", icon: "mdi:identifier");
-        if (MeterHasEpc(0xC0))
+        if (MeterHasEpc(meter, 0xC0))
         {
             //0xC0 Bルート識別番号(第2世代スマートメーターのみ)
             await PublishSensorConfigAsync(serial, "b_route_id", "Bルート識別番号", "static", icon: "mdi:identifier");
         }
-        if (MeterHasEpc(0xD0))
+        if (MeterHasEpc(meter, 0xD0))
         {
             //0xD0 1分積算電力量計測値(第2世代スマートメーターのみ)
             await PublishSensorConfigAsync(serial, "cumulative_1min_normal", "1分積算電力量計測値(正方向)", "passive_1min"
@@ -100,15 +116,15 @@ public class Worker(
 
         await SendButtonConfigAsync(serial, "active", "瞬時値の取得", "update");
         await SendButtonConfigAsync(serial, "passive", "積算電力量の取得", "update");
-        if (MeterHasEpc(0xD0))
+        if (MeterHasEpc(meter, 0xD0))
         {
             await SendButtonConfigAsync(serial, "1min", "1分積算電力量の取得", "update");
         }
 
     }
 
-    private bool MeterHasEpc(byte code)
-        => bRouteControllerService.Meter.EchoObjectInstance.GETProperties.Any(p => p.Spec.Code == code);
+    private static bool MeterHasEpc(低圧スマート電力量メータ meter, byte code)
+        => meter.EchoObjectInstance.GETProperties.Any(p => p.Spec.Code == code);
 
     private async Task PublishSensorConfigAsync(
         string serial, string type, string name, string subTopic
@@ -161,85 +177,89 @@ public class Worker(
 
     #region Notifiy Senser Stauts
 
-    public async Task PublishDeviceStaticStatusAsync()
+    public async Task PublishDeviceStaticStatusAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         await SendSensorStateAsync(serial, "static", new
         {
-            placement = bRouteControllerService.Meter.設置場所,
-            version = bRouteControllerService.Meter.規格Version情報,
-            makercode = bRouteControllerService.Meter.メーカコード,
-            serialnumber = bRouteControllerService.Meter.製造番号,
-            b_route_id = bRouteControllerService.Meter.Bルート識別番号,
+            placement = meter.設置場所,
+            version = meter.規格Version情報,
+            makercode = meter.メーカコード,
+            serialnumber = meter.製造番号,
+            b_route_id = meter.Bルート識別番号,
         });
         logger.LogInformation("ステータス(静的)通知 {a},{b},{c},{d},{e}",
-            bRouteControllerService.Meter.設置場所,
-            bRouteControllerService.Meter.規格Version情報,
-            bRouteControllerService.Meter.メーカコード,
-            bRouteControllerService.Meter.製造番号,
-            bRouteControllerService.Meter.Bルート識別番号
+            meter.設置場所,
+            meter.規格Version情報,
+            meter.メーカコード,
+            meter.製造番号,
+            meter.Bルート識別番号
             );
     }
-    public async Task PublishDeviceActiveStatusAsync()
+    public async Task PublishDeviceActiveStatusAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         await SendSensorStateAsync(serial, "active", new
         {
-            instantaneous_current_r = bRouteControllerService.Meter.瞬時電流計測値?.r,
-            instantaneous_current_t = bRouteControllerService.Meter.瞬時電流計測値?.t,
-            instantaneous_electric_power = bRouteControllerService.Meter.瞬時電力計測値,
-            timestamp = bRouteControllerService.Meter.現在年月日時刻
+            instantaneous_current_r = meter.瞬時電流計測値?.r,
+            instantaneous_current_t = meter.瞬時電流計測値?.t,
+            instantaneous_electric_power = meter.瞬時電力計測値,
+            timestamp = meter.現在年月日時刻
         });
-        logger.LogInformation("ステータス(瞬時)通知 {r}A,{t}A,{e}W,{time}",
-            bRouteControllerService.Meter.瞬時電流計測値?.r,
-            bRouteControllerService.Meter.瞬時電流計測値?.t,
-            bRouteControllerService.Meter.瞬時電力計測値,
-            bRouteControllerService.Meter.現在年月日時刻
+        logger.LogInformation("ステータス(瞬時)通知 {serial} {r}A,{t}A,{e}W,{time}",
+            meter.製造番号,
+            meter.瞬時電流計測値?.r,
+            meter.瞬時電流計測値?.t,
+            meter.瞬時電力計測値,
+            meter.現在年月日時刻
             );
     }
-    public async Task PublishDevicePassiveStatusAsync()
+    public async Task PublishDevicePassiveStatusAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         await SendSensorStateAsync(serial, "passive", new
         {
-            cumulative_normal = bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
-            cumulative_reverse = bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
-            timestamp = bRouteControllerService.Meter.現在年月日時刻
+            cumulative_normal = meter.積算電力量計測値_正方向計測値,
+            cumulative_reverse = meter.積算電力量計測値_逆方向計測値,
+            timestamp = meter.現在年月日時刻
         });
-        logger.LogInformation("ステータス(積算)通知 {n}W,{r}W,{time}",
-            bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
-            bRouteControllerService.Meter.積算電力量計測値_逆方向計測値,
-            bRouteControllerService.Meter.現在年月日時刻
+        logger.LogInformation("ステータス(積算)通知 {serial} {n}W,{r}W,{time}",
+            meter.製造番号,
+            meter.積算電力量計測値_正方向計測値,
+            meter.積算電力量計測値_逆方向計測値,
+            meter.現在年月日時刻
             );
     }
-    public async Task PublishDevicePassive1MinStatusAsync()
+    public async Task PublishDevicePassive1MinStatusAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         await SendSensorStateAsync(serial, "passive_1min", new
         {
-            cumulative_1min_normal = bRouteControllerService.Meter.一分積算電力量計測値?.normalKWh,
-            cumulative_1min_reverse = bRouteControllerService.Meter.一分積算電力量計測値?.reverseKWh,
-            timestamp = bRouteControllerService.Meter.一分積算電力量計測値?.datetime,
+            cumulative_1min_normal = meter.一分積算電力量計測値?.normalKWh,
+            cumulative_1min_reverse = meter.一分積算電力量計測値?.reverseKWh,
+            timestamp = meter.一分積算電力量計測値?.datetime,
         });
-        logger.LogInformation("ステータス(積算-1分)通知 {n}kWh,{r}kWh,{time}",
-            bRouteControllerService.Meter.一分積算電力量計測値?.normalKWh,
-            bRouteControllerService.Meter.一分積算電力量計測値?.reverseKWh,
-            bRouteControllerService.Meter.一分積算電力量計測値?.datetime
+        logger.LogInformation("ステータス(積算-1分)通知 {serial} {n}kWh,{r}kWh,{time}",
+            meter.製造番号,
+            meter.一分積算電力量計測値?.normalKWh,
+            meter.一分積算電力量計測値?.reverseKWh,
+            meter.一分積算電力量計測値?.datetime
             );
     }
-    public async Task PublishDevicePassiveOnTimeStatusAsync()
+    public async Task PublishDevicePassiveOnTimeStatusAsync(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         await SendSensorStateAsync(serial, "passive", new
         {
-            cumulative_normal = bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
-            cumulative_reverse = bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
-            timestamp = bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime,
+            cumulative_normal = meter.定時積算電力量計測値_正方向計測値?.kWh,
+            cumulative_reverse = meter.定時積算電力量計測値_逆方向計測値?.kWh,
+            timestamp = meter.定時積算電力量計測値_逆方向計測値?.datetime,
         });
-        logger.LogInformation("ステータス(積算-定時)通知 {n}W,{r}W,{time}",
-            bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
-            bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.kWh,
-            bRouteControllerService.Meter.定時積算電力量計測値_逆方向計測値?.datetime
+        logger.LogInformation("ステータス(積算-定時)通知 {serial} {n}W,{r}W,{time}",
+            meter.製造番号,
+            meter.定時積算電力量計測値_正方向計測値?.kWh,
+            meter.定時積算電力量計測値_逆方向計測値?.kWh,
+            meter.定時積算電力量計測値_逆方向計測値?.datetime
             );
     }
     private async Task SendSensorStateAsync(
@@ -249,23 +269,23 @@ public class Worker(
     }
     #endregion
 
-    private void SubscribeCommandTopic()
+    private void SubscribeCommandTopic(低圧スマート電力量メータ meter)
     {
-        var serial = MeterSerial;
+        var serial = GetSerial(meter);
         mqttService.Subscribe($"homeassistant/button/{serial}/cmd", async (payload) =>
         {
-            logger.LogInformation("コマンドを受信:{payload}", payload);
+            logger.LogInformation("コマンドを受信:{serial} {payload}", meter.製造番号, payload);
             if (payload == "active")
             {
-                await bRouteControllerService.ReadActivePropertiesAsync();
+                await bRouteControllerService.RequestReadAsync(meter, PendingReadKind.Active);
             }
             else if (payload == "passive")
             {
-                await bRouteControllerService.ReadPassivePropertiesAsync();
+                await bRouteControllerService.RequestReadAsync(meter, PendingReadKind.Passive);
             }
             else if (payload == "1min")
             {
-                await bRouteControllerService.ReadPassive1MinPropertiesAsync();
+                await bRouteControllerService.RequestReadAsync(meter, PendingReadKind.OneMin);
             }
         });
     }

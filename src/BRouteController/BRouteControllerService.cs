@@ -6,10 +6,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SkstackIpDotNet.Responses;
+using System.Collections.Concurrent;
 using System.IO.Ports;
 using System.Text;
 
 namespace BRouteController;
+
+/// <summary>
+/// ボタン押下等で要求された読み出しの種別(複数モードでは次回巡回時まで保留される)
+/// </summary>
+[Flags]
+public enum PendingReadKind
+{
+    None = 0,
+    Active = 1,
+    Passive = 2,
+    OneMin = 4,
+}
 
 public class BRouteControllerService : IDisposable
 {
@@ -47,8 +60,42 @@ public class BRouteControllerService : IDisposable
     }
     public 低圧スマート電力量メータ Meter { get; private set; } = default!;
 
+    /// <summary>単体/複数モード(InitalizeAsync で確定)</summary>
+    public BRouteMode Mode { get; private set; } = BRouteMode.Single;
+
+    /// <summary>複数モードで検出済みのメーター(キーは製造番号)</summary>
+    public ConcurrentDictionary<string, 低圧スマート電力量メータ> Meters { get; } = new();
+
+    /// <summary>複数モードの巡回状態(設定順)</summary>
+    private List<MeterVisitState> _meterStates = [];
+
+    /// <summary>ボタン押下等の保留読み出し(キーは製造番号)</summary>
+    private readonly ConcurrentDictionary<string, PendingReadKind> _pendingReads = new();
+
+    /// <summary>連続失敗したメーターの巡回を間引く最大サイクル数</summary>
+    private const int MaxPollSkipCycles = 5;
+
+    private sealed class MeterVisitState
+    {
+        public required BRouteMeterCredential Credential { get; init; }
+        /// <summary>BルートID下8桁(=拡張ビーコンの Pairing ID)</summary>
+        public required string PairId { get; init; }
+        public required string PanCachePath { get; init; }
+        public bool DiscoveryCompleted { get; set; }
+        public string? Serial { get; set; }
+        public int ConsecutiveFailures { get; set; }
+        public int SkipRemaining { get; set; }
+    }
+
     public async Task InitalizeAsync(CancellationToken ct)
     {
+        Mode = _optionsMonitor.CurrentValue.ResolveMode();
+        if (Mode == BRouteMode.Multiple)
+        {
+            await InitalizeMultiAsync(ct);
+            return;
+        }
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         cts.CancelAfter(TimeSpan.FromMinutes(5));
 
@@ -65,8 +112,51 @@ public class BRouteControllerService : IDisposable
 
         Meter = new 低圧スマート電力量メータ(node, device);
     }
+
+    private async Task InitalizeMultiAsync(CancellationToken ct)
+    {
+        var options = _optionsMonitor.CurrentValue;
+        var states = new List<MeterVisitState>();
+        foreach (var (credential, index) in options.Meters.Select((m, i) => (m, i)))
+        {
+            if (string.IsNullOrEmpty(credential.Id) || string.IsNullOrEmpty(credential.Pw))
+            {
+                throw new ApplicationException($"BRoute:Meters[{index}] の Id/Pw が未設定です");
+            }
+            if (credential.Id.Length < 8)
+            {
+                throw new ApplicationException($"BRoute:Meters[{index}] の Id が短すぎます(下8桁を PairingID として使用します)");
+            }
+            var pairId = credential.Id[^8..];
+            if (states.Any(s => s.PairId.Equals(pairId, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ApplicationException($"BRoute:Meters[{index}] の PairingID(ID下8桁:{pairId})が重複しています");
+            }
+            states.Add(new MeterVisitState
+            {
+                Credential = credential,
+                PairId = pairId,
+                PanCachePath = Path.Combine(
+                    Path.GetDirectoryName(options.PanDescSavePath) ?? string.Empty,
+                    $"EPANDESC.{pairId}.json"),
+            });
+        }
+        _meterStates = states;
+
+        await _skStackClient.OpenAsync(options.SerialPort, 115200, 8, Parity.None, StopBits.One);
+        //自ノードのIPアドレスはセッションに依らないため1回だけ設定
+        _echoClient.Initialize(_skStackClient.SelfIpaddr);
+        _logger.LogInformation("複数モード: {Count}台のメーターを巡回します", _meterStates.Count);
+        //各メーターへの接続・初期化は巡回(PollAsync)に委ねる
+    }
+
     public async Task PollAsync(CancellationToken ct)
     {
+        if (Mode == BRouteMode.Multiple)
+        {
+            await PollMultiAsync(ct);
+            return;
+        }
         //Timer Loop
         var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.InstantaneousValueInterval);
         while (await timer.WaitForNextTickAsync(ct))
@@ -75,10 +165,266 @@ public class BRouteControllerService : IDisposable
         }
     }
 
-    public Func<Task>? PassivePropertiesReadedCallback;
-    public Func<Task>? PassivePropertiesOnTimeCallback;
-    public Func<Task>? Passive1MinPropertiesReadedCallback;
-    public Func<Task>? ActivePropertiesReadedCallback;
+    private async Task PollMultiAsync(CancellationToken ct)
+    {
+        //InstantaneousValueInterval は巡回の開始間隔(1巡がこれを超えた場合は続けて次巡回)
+        var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.InstantaneousValueInterval);
+        do
+        {
+            foreach (var state in _meterStates)
+            {
+                ct.ThrowIfCancellationRequested();
+                if (state.SkipRemaining > 0)
+                {
+                    state.SkipRemaining--;
+                    _logger.LogInformation("PairingID:{PairId} は連続失敗のため今回の巡回をスキップ(残り{Remaining}回)", state.PairId, state.SkipRemaining);
+                    continue;
+                }
+                try
+                {
+                    await VisitMeterAsync(state, ct);
+                    state.ConsecutiveFailures = 0;
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    state.ConsecutiveFailures++;
+                    state.SkipRemaining = Math.Min(state.ConsecutiveFailures - 1, MaxPollSkipCycles);
+                    _logger.LogError(ex, "PairingID:{PairId} の巡回で例外(連続{Failures}回目)", state.PairId, state.ConsecutiveFailures);
+                    if (!_optionsMonitor.CurrentValue.ContinuePollingOnError)
+                    {
+                        throw;
+                    }
+                }
+            }
+        } while (await timer.WaitForNextTickAsync(ct));
+    }
+
+    /// <summary>
+    /// 1メーターへの1訪問: 接続→(初回のみ初期化)→瞬時値/定時積算の取得→保留コマンド→切断
+    /// </summary>
+    private async Task VisitMeterAsync(MeterVisitState state, CancellationToken ct)
+    {
+        var options = _optionsMonitor.CurrentValue;
+        _logger.LogInformation("PairingID:{PairId} の巡回を開始", state.PairId);
+        //メーター毎に PSK/RBID が異なるため毎訪問設定する
+        await _skStackClient.SetIdPasswordAsync(state.Credential.Id, state.Credential.Pw);
+
+        var (epandesc, fromCache) = await ScanPanMultiAsync(state, ct);
+        var joined = await _skStackClient.JoinAsync(epandesc, (int)options.PanaConnectTimeout.TotalMilliseconds);
+        if (!joined && fromCache)
+        {
+            //キャッシュした PAN 情報が古い可能性があるため、破棄して再スキャン→再接続を1回だけ試す
+            _logger.LogWarning("キャッシュしたPAN情報での接続に失敗。キャッシュを破棄して再スキャンします(PairingID:{PairId})", state.PairId);
+            File.Delete(state.PanCachePath);
+            (epandesc, _) = await ScanPanMultiAsync(state, ct);
+            joined = await _skStackClient.JoinAsync(epandesc, (int)options.PanaConnectTimeout.TotalMilliseconds);
+        }
+        if (!joined)
+        {
+            throw new ApplicationException($"PANA接続に失敗(PairingID:{state.PairId})");
+        }
+        try
+        {
+            var (node, device) = await EnsureMeterInitializedAsync(state, ct);
+
+            await _semaphore.WaitAsync(ct);
+            try
+            {
+                //0x97 現在時刻設定 / 0x98 現在年月日設定
+                await ReadTargetPropertiesAsync(node, device, [0x97, 0x98]);
+                //0xE7 瞬時電力計測値 / 0xE8 瞬時電流計測値
+                await ReadTargetPropertiesAsync(node, device, [0xE7, 0xE8]);
+                //0xEA/0xEB 定時積算電力量計測値(30分毎の定時値。INF通知の代わりにポーリングで取得)
+                await ReadTargetPropertiesAsync(node, device, [0xEA, 0xEB]);
+
+                //ボタン押下等で保留された読み出しを実行(Active は上で取得済みのためフラグ消化のみ)
+                if (state.Serial != null && _pendingReads.TryRemove(state.Serial, out var pending))
+                {
+                    if ((pending & PendingReadKind.Passive) != 0)
+                    {
+                        await ReadTargetPropertiesAsync(node, device, [0xE0, 0xE3]);
+                    }
+                    if ((pending & PendingReadKind.OneMin) != 0)
+                    {
+                        await ReadTargetPropertiesAsync(node, device, [0xD0]);
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            _logger.LogInformation("PairingID:{PairId} の巡回が完了", state.PairId);
+        }
+        finally
+        {
+            await _skStackClient.TerminateAsync((int)options.SkTermTimeout.TotalMilliseconds);
+        }
+    }
+
+    private async Task<(EPANDESC epandesc, bool fromCache)> ScanPanMultiAsync(MeterVisitState state, CancellationToken ct)
+    {
+        var options = _optionsMonitor.CurrentValue;
+        if (!options.ForcePANScan && File.Exists(state.PanCachePath))
+        {
+            var cached = JsonConvert.DeserializeObject<EPANDESC>(await File.ReadAllTextAsync(state.PanCachePath, ct));
+            if (cached != null)
+            {
+                _logger.LogInformation("PANスキャンスキップ(PairingID:{PairId})", state.PairId);
+                return (cached, true);
+            }
+        }
+        EPANDESC? epandesc = null;
+        for (var count = 0; count <= options.PanScanMaxRetryAttempts; count++)
+        {
+            var (scanResult, found) = await _skStackClient.ScanAsync(state.PairId);
+            if (scanResult)
+            {
+                epandesc = found;
+                _logger.LogInformation("PANスキャン{count}(PairingID:{PairId})", count + 1, state.PairId);
+                break;
+            }
+            ct.ThrowIfCancellationRequested();
+            if (count != options.PanScanMaxRetryAttempts)
+            {
+                _logger.LogWarning("{Delay}後にスキャンを再試行します", options.PanScanRetryDelay);
+                await Task.Delay(options.PanScanRetryDelay, ct);
+            }
+        }
+        if (epandesc == null)
+        {
+            throw new ApplicationException($"PANスキャン リトライオーバー(PairingID:{state.PairId})");
+        }
+        Directory.CreateDirectory(Path.GetDirectoryName(state.PanCachePath)!);
+        await File.WriteAllTextAsync(state.PanCachePath,
+            JsonConvert.SerializeObject(epandesc, Formatting.Indented), Encoding.UTF8, ct);
+        return (epandesc, false);
+    }
+
+    /// <summary>
+    /// 現在接続中のメーターのノード/デバイスを解決する。
+    /// 初回訪問(またはメーター交換等でノードが未知)の場合は、
+    /// インスタンスリスト＋プロパティマップの取得と定性情報の読み出しを行い、Meters に登録する
+    /// </summary>
+    private async Task<(EchoNode node, EchoObjectInstance device)> EnsureMeterInitializedAsync(MeterVisitState state, CancellationToken ct)
+    {
+        var meterAddress = _skStackClient.SmartMaterIpaddr;
+        var node = _echoClient.NodeList.FirstOrDefault(n => n.Address == meterAddress);
+        var device = node?.Devices.FirstOrDefault(d => d.Spec == EchoDotNetLite.Specifications.機器.住宅設備関連機器.低圧スマート電力量メータ);
+
+        if (device == null || !device.IsPropertyMapGet)
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromMinutes(5));
+            await _echoClient.インスタンスリスト通知Async();
+            await _echoClient.インスタンスリスト通知要求Async();
+            _logger.LogInformation("プロパティマップ読み込み完了まで待機(PairingID:{PairId})", state.PairId);
+            var waitCount = 0;
+            while (true)
+            {
+                node = _echoClient.NodeList.FirstOrDefault(n => n.Address == meterAddress);
+                device = node?.Devices.FirstOrDefault(d => d.Spec == EchoDotNetLite.Specifications.機器.住宅設備関連機器.低圧スマート電力量メータ);
+                if (device != null && device.IsPropertyMapGet)
+                {
+                    break;
+                }
+                cts.Token.ThrowIfCancellationRequested();
+                _logger.LogInformation("プロパティマップ読み込み待機中");
+                await Task.Delay(2 * 1000, cts.Token);
+                waitCount++;
+                if (waitCount % 10 == 0)
+                {
+                    //要求のロストやプロパティマップ読み取りのタイムアウトから回復するため再送する
+                    _logger.LogWarning("応答がないためインスタンスリスト通知要求を再送します(PairingID:{PairId})", state.PairId);
+                    await _echoClient.インスタンスリスト通知要求Async();
+                }
+            }
+        }
+
+        if (!state.DiscoveryCompleted || state.Serial == null || !Meters.ContainsKey(state.Serial))
+        {
+            //初回訪問: 換算に必要な係数と定性情報を取得
+            await _semaphore.WaitAsync(ct);
+            try
+            {
+                //0xD3 係数 / 0xE1 積算電力量単位 / 0xD7 積算電力量有効桁数
+                await ReadTargetPropertiesAsync(node!, device, [0xD3, 0xE1, 0xD7]);
+                //0x8A メーカコード / 0x8D 製造番号 / 0x82 規格Version情報 / 0x81 設置場所
+                await ReadTargetPropertiesAsync(node!, device, [0x8A, 0x8D, 0x82, 0x81]);
+                //0xC0 Bルート識別番号(第2世代スマートメーターのみ)
+                await ReadTargetPropertiesAsync(node!, device, [0xC0]);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            var meter = new 低圧スマート電力量メータ(node!, device);
+            var serial = meter.製造番号
+                ?? throw new ApplicationException($"製造番号(0x8D)が取得できませんでした(PairingID:{state.PairId})");
+            state.Serial = serial;
+            Meters[serial] = meter;
+            state.DiscoveryCompleted = true;
+            _logger.LogInformation("メーターを検出: 製造番号:{Serial} (PairingID:{PairId})", serial, state.PairId);
+            if (MeterDiscoveredCallback != null)
+            {
+                await MeterDiscoveredCallback(meter);
+            }
+        }
+        return (node!, device);
+    }
+
+    /// <summary>
+    /// 対象EPCのうちメーターのGetプロパティマップに載っているものだけを読み出す(該当なしなら何もしない)
+    /// </summary>
+    private async Task ReadTargetPropertiesAsync(EchoNode node, EchoObjectInstance device, byte[] target)
+    {
+        var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
+        if (!properties.Any())
+        {
+            return;
+        }
+        await ReadPropertyWithRetry(node, device, properties);
+    }
+
+    /// <summary>
+    /// ボタン押下等による読み出し要求。
+    /// 単体モードは即時実行、複数モードは次回巡回時まで保留する
+    /// </summary>
+    public async Task RequestReadAsync(低圧スマート電力量メータ meter, PendingReadKind kind)
+    {
+        if (Mode == BRouteMode.Single)
+        {
+            switch (kind)
+            {
+                case PendingReadKind.Active:
+                    await ReadActivePropertiesAsync();
+                    break;
+                case PendingReadKind.Passive:
+                    await ReadPassivePropertiesAsync();
+                    break;
+                case PendingReadKind.OneMin:
+                    await ReadPassive1MinPropertiesAsync();
+                    break;
+                default:
+                    break;
+            }
+            return;
+        }
+        var serial = meter.製造番号!;
+        _pendingReads.AddOrUpdate(serial, kind, (_, current) => current | kind);
+        _logger.LogInformation("製造番号:{Serial} への {Kind} 読み出しを次回巡回時に実行します", serial, kind);
+    }
+
+    public Func<低圧スマート電力量メータ, Task>? PassivePropertiesReadedCallback;
+    public Func<低圧スマート電力量メータ, Task>? PassivePropertiesOnTimeCallback;
+    public Func<低圧スマート電力量メータ, Task>? Passive1MinPropertiesReadedCallback;
+    public Func<低圧スマート電力量メータ, Task>? ActivePropertiesReadedCallback;
+    /// <summary>複数モードでメーターを初回検出したときに呼ばれる(discovery 公開の起点)</summary>
+    public Func<低圧スマート電力量メータ, Task>? MeterDiscoveredCallback;
 
     public async Task ReadActivePropertiesAsync(bool continueOnError = false)
     {
@@ -268,7 +614,7 @@ public class BRouteControllerService : IDisposable
             {
                 break;
             }
-            if (count != _optionsMonitor.CurrentValue.PanScanMaxRetryAttempts)
+            if (count != _optionsMonitor.CurrentValue.PanaConnectMaxRetryAttempts)
             {
                 _logger.LogWarning("{Delay}後に接続を再試行します", _optionsMonitor.CurrentValue.PanaConnectRetryDelay);
                 await Task.Delay(_optionsMonitor.CurrentValue.PanaConnectRetryDelay, ct);
@@ -360,7 +706,12 @@ public class BRouteControllerService : IDisposable
         {
             _logger.LogDebug("EchoProperty Change {Property} {HexValue}", echoPropertyInstance.GetDebugString(), SkstackIpDotNet.BytesConvert.ToHexString(e));
 
-            if (Meter != null)
+            //どのメーターのプロパティ変更かを特定
+            低圧スマート電力量メータ? meter = Mode == BRouteMode.Single
+                ? Meter
+                : Meters.Values.FirstOrDefault(m => m.EchoObjectInstance.Properties.Contains(echoPropertyInstance));
+
+            if (meter != null)
             {
                 if (echoPropertyInstance.Spec.Code == 0xE0 || echoPropertyInstance.Spec.Code == 0xE3)
                 {
@@ -368,7 +719,7 @@ public class BRouteControllerService : IDisposable
                     //0xE3 積算電力量計測値 (逆方向計測値)
                     if (PassivePropertiesReadedCallback != null)
                     {
-                        Task.Run(PassivePropertiesReadedCallback);
+                        Task.Run(() => PassivePropertiesReadedCallback(meter));
                     }
                 }
                 if (echoPropertyInstance.Spec.Code == 0xEA || echoPropertyInstance.Spec.Code == 0xEB)
@@ -377,7 +728,7 @@ public class BRouteControllerService : IDisposable
                     //0xEB 定時積算電力量計測値 (逆方向計測値)
                     if (PassivePropertiesOnTimeCallback != null)
                     {
-                        Task.Run(PassivePropertiesOnTimeCallback);
+                        Task.Run(() => PassivePropertiesOnTimeCallback(meter));
                     }
                 }
                 if (echoPropertyInstance.Spec.Code == 0xD0)
@@ -385,7 +736,7 @@ public class BRouteControllerService : IDisposable
                     //0xD0 1分積算電力量計測値（正方向、逆方向計測値）
                     if (Passive1MinPropertiesReadedCallback != null)
                     {
-                        Task.Run(Passive1MinPropertiesReadedCallback);
+                        Task.Run(() => Passive1MinPropertiesReadedCallback(meter));
                     }
                 }
                 if (echoPropertyInstance.Spec.Code == 0xE7 || echoPropertyInstance.Spec.Code == 0xE8)
@@ -394,7 +745,7 @@ public class BRouteControllerService : IDisposable
                     //0xE8 瞬時電流計測値
                     if (ActivePropertiesReadedCallback != null)
                     {
-                        Task.Run(ActivePropertiesReadedCallback);
+                        Task.Run(() => ActivePropertiesReadedCallback(meter));
                     }
                 }
             }
