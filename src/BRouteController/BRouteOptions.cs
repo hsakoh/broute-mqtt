@@ -40,7 +40,7 @@ public class BRouteOptions
     public int PanScanMaxRetryAttempts { get; set; } = 3;
     public TimeSpan PanScanRetryDelay { get; set; } = TimeSpan.FromSeconds(60);
 
-    public TimeSpan PanaConnectTimeout { get; set; } = TimeSpan.FromSeconds(30);
+    public TimeSpan PanaConnectTimeout { get; set; } = TimeSpan.FromSeconds(60);
     public int PanaConnectMaxRetryAttempts { get; set; } = 3;
     public TimeSpan PanaConnectRetryDelay { get; set; } = TimeSpan.FromSeconds(60);
 

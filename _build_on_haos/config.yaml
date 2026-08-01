@@ -25,7 +25,7 @@ options:
     InstantaneousValueInterval: '00:01:10'
     PanScanMaxRetryAttempts: 3
     PanScanRetryDelay: '00:01:00'
-    PanaConnectTimeout: '00:00:30'
+    PanaConnectTimeout: '00:01:00'
     PanaConnectMaxRetryAttempts: 3
     PanaConnectRetryDelay: '00:01:00'
     SkTermTimeout: '00:00:10'
