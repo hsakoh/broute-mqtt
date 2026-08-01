@@ -32,6 +32,7 @@ options:
     PropertyReadRetryDelay: '00:00:05'
     PropertyReadIntervalDelay: '00:00:02'
     ContinuePollingOnError: true
+    AddWiSunSuffix: false
   Mqtt: 
     AutoConfig: true
     Host: ''
@@ -59,6 +60,7 @@ schema:
     PropertyReadRetryDelay: str
     PropertyReadIntervalDelay: str
     ContinuePollingOnError: bool
+    AddWiSunSuffix: bool
   Mqtt: 
     AutoConfig: bool
     Host: str?

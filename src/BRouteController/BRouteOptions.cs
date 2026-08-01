@@ -28,4 +28,10 @@ public class BRouteOptions
     public TimeSpan PropertyReadIntervalDelay { get; set; } = TimeSpan.FromSeconds(2);
 
     public bool ContinuePollingOnError { get; set; } = true;
+
+    /// <summary>
+    /// broute-wifi-mqtt と同一メーターを同時に参照する場合に、
+    /// MQTT Discovery の識別子(トピック/unique_id/device.identifiers)へ "_wisun" を付与して衝突を回避する
+    /// </summary>
+    public bool AddWiSunSuffix { get; set; } = false;
 }

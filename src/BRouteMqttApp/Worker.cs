@@ -1,5 +1,6 @@
 using BRouteController;
 using HomeAssistantAddOn.Mqtt;
+using Microsoft.Extensions.Options;
 
 namespace BRouteMqttApp;
 
@@ -7,8 +8,19 @@ public class Worker(
     ILogger<Worker> logger
         , BRouteControllerService bRouteControllerService
         , MqttService mqttService
+        , IOptionsMonitor<BRouteOptions> bRouteOptions
         ) : BackgroundService
 {
+    /// <summary>
+    /// broute-wifi-mqtt との同時稼働時に識別子の衝突を避けるためのサフィックス。
+    /// トピック/unique_id/device.identifiers に付与する(センサー値としての製造番号には付与しない)
+    /// </summary>
+    private string MeterSerial
+        => bRouteControllerService.Meter.製造番号! + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "_wisun" : "");
+
+    private string DeviceName
+        => nameof(低圧スマート電力量メータ) + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "(Wi-SUN)" : "");
+
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         await mqttService.StartAsync();
@@ -48,7 +60,7 @@ public class Worker(
     #region Configure Senser
     private async Task PublishDeviceConfigsAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await PublishSensorConfigAsync(serial, "placement", "設置場所", "static", icon: "mdi:map-marker");
         await PublishSensorConfigAsync(serial, "version", "規格Version情報", "static", icon: "mdi:information");
         await PublishSensorConfigAsync(serial, "makercode", "メーカコード", "static", icon: "mdi:factory");
@@ -120,7 +132,7 @@ public class Worker(
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
-                name = nameof(低圧スマート電力量メータ),
+                name = DeviceName,
             },
         };
         await mqttService.PublishAsync($"homeassistant/sensor/{type}_{serial}/config", payload, true);
@@ -140,7 +152,7 @@ public class Worker(
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
-                name = nameof(低圧スマート電力量メータ),
+                name = DeviceName,
             },
         };
         await mqttService.PublishAsync($"homeassistant/button/btn_{type}_{serial}/config", payload, true);
@@ -151,26 +163,26 @@ public class Worker(
 
     public async Task PublishDeviceStaticStatusAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await SendSensorStateAsync(serial, "static", new
         {
             placement = bRouteControllerService.Meter.設置場所,
             version = bRouteControllerService.Meter.規格Version情報,
             makercode = bRouteControllerService.Meter.メーカコード,
-            serialnumber = serial,
+            serialnumber = bRouteControllerService.Meter.製造番号,
             b_route_id = bRouteControllerService.Meter.Bルート識別番号,
         });
         logger.LogInformation("ステータス(静的)通知 {a},{b},{c},{d},{e}",
             bRouteControllerService.Meter.設置場所,
             bRouteControllerService.Meter.規格Version情報,
             bRouteControllerService.Meter.メーカコード,
-            serial,
+            bRouteControllerService.Meter.製造番号,
             bRouteControllerService.Meter.Bルート識別番号
             );
     }
     public async Task PublishDeviceActiveStatusAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await SendSensorStateAsync(serial, "active", new
         {
             instantaneous_current_r = bRouteControllerService.Meter.瞬時電流計測値?.r,
@@ -187,7 +199,7 @@ public class Worker(
     }
     public async Task PublishDevicePassiveStatusAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await SendSensorStateAsync(serial, "passive", new
         {
             cumulative_normal = bRouteControllerService.Meter.積算電力量計測値_正方向計測値,
@@ -202,7 +214,7 @@ public class Worker(
     }
     public async Task PublishDevicePassive1MinStatusAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await SendSensorStateAsync(serial, "passive_1min", new
         {
             cumulative_1min_normal = bRouteControllerService.Meter.一分積算電力量計測値?.normalKWh,
@@ -217,7 +229,7 @@ public class Worker(
     }
     public async Task PublishDevicePassiveOnTimeStatusAsync()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         await SendSensorStateAsync(serial, "passive", new
         {
             cumulative_normal = bRouteControllerService.Meter.定時積算電力量計測値_正方向計測値?.kWh,
@@ -239,7 +251,7 @@ public class Worker(
 
     private void SubscribeCommandTopic()
     {
-        var serial = bRouteControllerService.Meter.製造番号!;
+        var serial = MeterSerial;
         mqttService.Subscribe($"homeassistant/button/{serial}/cmd", async (payload) =>
         {
             logger.LogInformation("コマンドを受信:{payload}", payload);
