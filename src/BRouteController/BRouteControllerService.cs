@@ -161,8 +161,57 @@ public class BRouteControllerService : IDisposable
         var timer = new PeriodicTimer(_optionsMonitor.CurrentValue.InstantaneousValueInterval);
         while (await timer.WaitForNextTickAsync(ct))
         {
+            if (!_skStackClient.IsPanaSessionAlive)
+            {
+                //EVENT 0x26/0x29 等でセッションが失われた場合の自動復旧
+                try
+                {
+                    await ReconnectPanaAsync(ct);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "PANAセッションの再接続に失敗");
+                    if (!_optionsMonitor.CurrentValue.ContinuePollingOnError)
+                    {
+                        throw;
+                    }
+                    continue;
+                }
+            }
             await ReadActivePropertiesAsync(_optionsMonitor.CurrentValue.ContinuePollingOnError);
         }
+    }
+
+    /// <summary>
+    /// 単体モードでセッション喪失から再接続する。
+    /// キャッシュした PAN 情報で再接続を試み、失敗した場合はキャッシュを破棄して再スキャンする
+    /// </summary>
+    private async Task ReconnectPanaAsync(CancellationToken ct)
+    {
+        _logger.LogWarning("PANAセッションが失われているため再接続します");
+        var options = _optionsMonitor.CurrentValue;
+        await _skStackClient.SetIdPasswordAsync(options.Id, options.Pw);
+
+        if (File.Exists(options.PanDescSavePath))
+        {
+            var cached = JsonConvert.DeserializeObject<EPANDESC>(await File.ReadAllTextAsync(options.PanDescSavePath, ct));
+            if (cached != null
+                && await _skStackClient.JoinAsync(cached, (int)options.PanaConnectTimeout.TotalMilliseconds))
+            {
+                _logger.LogInformation("PANAセッションを再確立しました");
+                return;
+            }
+            //キャッシュで繋がらない場合は破棄して再スキャンから
+            _logger.LogWarning("キャッシュしたPAN情報で再接続できないため再スキャンします");
+            File.Delete(options.PanDescSavePath);
+        }
+        var epandesc = await ScanPanAsync(ct);
+        await ConnectPanaAsync(epandesc, ct);
+        _logger.LogInformation("PANAセッションを再確立しました");
     }
 
     private async Task PollMultiAsync(CancellationToken ct)
