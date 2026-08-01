@@ -14,9 +14,10 @@ devices:
 services:
   - 'mqtt:need'
 options:
-  BRoute: 
+  BRoute:
     Id: ''
     Pw: ''
+    Meters: []
     SerialPort: '/dev/ttyUSB0'
     UseBP35C0Commands: false
     ForcePANScan: false
@@ -27,6 +28,7 @@ options:
     PanaConnectTimeout: '00:00:30'
     PanaConnectMaxRetryAttempts: 3
     PanaConnectRetryDelay: '00:01:00'
+    SkTermTimeout: '00:00:10'
     PropertyReadTimeout: '00:00:05'
     PropertyReadMaxRetryAttempts: 3
     PropertyReadRetryDelay: '00:00:05'
@@ -42,9 +44,12 @@ options:
     Tls: false
   LogLevel: 'Trace'
 schema:
-  BRoute: 
-    Id: str
-    Pw: password
+  BRoute:
+    Id: str?
+    Pw: password?
+    Meters:
+      - Id: str
+        Pw: password
     SerialPort: str
     UseBP35C0Commands: bool
     ForcePANScan: bool
@@ -55,6 +60,7 @@ schema:
     PanaConnectTimeout: str
     PanaConnectMaxRetryAttempts: int
     PanaConnectRetryDelay: str
+    SkTermTimeout: str
     PropertyReadTimeout: str
     PropertyReadMaxRetryAttempts: int
     PropertyReadRetryDelay: str
