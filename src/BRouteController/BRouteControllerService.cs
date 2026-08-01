@@ -309,6 +309,8 @@ public class BRouteControllerService : IDisposable
                 //セッションを張り直して同一訪問内でもう一度だけ初期化を試す
                 _logger.LogWarning("初期化がタイムアウトしたため、セッションを再確立して再試行します(PairingID:{PairId})", state.PairId);
                 await _skStackClient.TerminateAsync((int)options.SkTermTimeout.TotalMilliseconds);
+                //SKTERM直後の再認証はメーター側のセッション後始末と競合して0x24になることがあるため、少し待ってから張り直す
+                await Task.Delay(TimeSpan.FromSeconds(10), ct);
                 if (!await _skStackClient.JoinAsync(epandesc, (int)options.PanaConnectTimeout.TotalMilliseconds))
                 {
                     throw new ApplicationException($"PANA接続に失敗(PairingID:{state.PairId})");
