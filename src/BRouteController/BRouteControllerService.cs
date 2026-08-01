@@ -234,8 +234,9 @@ public class BRouteControllerService : IDisposable
                     await VisitMeterAsync(state, ct);
                     state.ConsecutiveFailures = 0;
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
+                    //アプリ停止によるキャンセルのみ伝播する(メーター個別のタイムアウトは下の失敗処理に流す)
                     throw;
                 }
                 catch (Exception ex)
@@ -367,30 +368,39 @@ public class BRouteControllerService : IDisposable
 
         if (device == null || !device.IsPropertyMapGet)
         {
+            //不調なメーターが巡回全体を長時間塞がないよう、初期化待ちはこの時間で打ち切って次のメーターへ進む
+            var discoveryTimeout = TimeSpan.FromSeconds(90);
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            cts.CancelAfter(TimeSpan.FromMinutes(5));
-            await _echoClient.インスタンスリスト通知Async();
-            await _echoClient.インスタンスリスト通知要求Async();
-            _logger.LogInformation("プロパティマップ読み込み完了まで待機(PairingID:{PairId})", state.PairId);
-            var waitCount = 0;
-            while (true)
+            cts.CancelAfter(discoveryTimeout);
+            try
             {
-                node = _echoClient.NodeList.FirstOrDefault(n => n.Address == meterAddress);
-                device = node?.Devices.FirstOrDefault(d => d.Spec == EchoDotNetLite.Specifications.機器.住宅設備関連機器.低圧スマート電力量メータ);
-                if (device != null && device.IsPropertyMapGet)
+                await _echoClient.インスタンスリスト通知Async();
+                await _echoClient.インスタンスリスト通知要求Async();
+                _logger.LogInformation("プロパティマップ読み込み完了まで待機(PairingID:{PairId})", state.PairId);
+                var waitCount = 0;
+                while (true)
                 {
-                    break;
+                    node = _echoClient.NodeList.FirstOrDefault(n => n.Address == meterAddress);
+                    device = node?.Devices.FirstOrDefault(d => d.Spec == EchoDotNetLite.Specifications.機器.住宅設備関連機器.低圧スマート電力量メータ);
+                    if (device != null && device.IsPropertyMapGet)
+                    {
+                        break;
+                    }
+                    cts.Token.ThrowIfCancellationRequested();
+                    _logger.LogInformation("プロパティマップ読み込み待機中");
+                    await Task.Delay(2 * 1000, cts.Token);
+                    waitCount++;
+                    if (waitCount % 10 == 0)
+                    {
+                        //要求のロストやプロパティマップ読み取りのタイムアウトから回復するため再送する
+                        _logger.LogWarning("応答がないためインスタンスリスト通知要求を再送します(PairingID:{PairId})", state.PairId);
+                        await _echoClient.インスタンスリスト通知要求Async();
+                    }
                 }
-                cts.Token.ThrowIfCancellationRequested();
-                _logger.LogInformation("プロパティマップ読み込み待機中");
-                await Task.Delay(2 * 1000, cts.Token);
-                waitCount++;
-                if (waitCount % 10 == 0)
-                {
-                    //要求のロストやプロパティマップ読み取りのタイムアウトから回復するため再送する
-                    _logger.LogWarning("応答がないためインスタンスリスト通知要求を再送します(PairingID:{PairId})", state.PairId);
-                    await _echoClient.インスタンスリスト通知要求Async();
-                }
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                throw new ApplicationException($"プロパティマップ読み込みがタイムアウトしました(PairingID:{state.PairId})");
             }
         }
 
