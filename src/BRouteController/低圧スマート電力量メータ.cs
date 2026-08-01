@@ -215,6 +215,70 @@ public class 低圧スマート電力量メータ
             return $"Release:{Encoding.ASCII.GetString(prop.Value[2..3])},Revision:{(int)prop.Value[3]}";
         }
     }
+    public string? Bルート識別番号
+    {
+        get
+        {
+            var prop = EchoObjectInstance.GETProperties.Where(p => p.Spec.Code == 0xC0).FirstOrDefault();
+            if (prop == null)
+            {
+                return null;
+            }
+            return BytesConvert.ToHexString(prop.Value);
+        }
+    }
+
+    public (long datetime, decimal? normalKWh, decimal? reverseKWh)? 一分積算電力量計測値
+    {
+        get
+        {
+            var prop = EchoObjectInstance.GETProperties.Where(p => p.Spec.Code == 0xD0).FirstOrDefault();
+            if (prop == null)
+            {
+                return null;
+            }
+            var ymdhms = prop.Value[0..7];
+            var datetime = new DateTimeOffset(
+                BinaryPrimitives.ReadInt16BigEndian(ymdhms), ymdhms[2], ymdhms[3],
+                ymdhms[4], ymdhms[5], ymdhms[6], TimeSpan.FromHours(9));
+
+            byte[]? d3 = EchoObjectInstance.GETProperties.Where(p => p.Spec.Code == 0xD3).FirstOrDefault()?.Value;
+            byte? e1 = EchoObjectInstance.GETProperties.Where(p => p.Spec.Code == 0xE1).FirstOrDefault()?.Value[0];
+            if (d3 == null || e1 == null)
+            {
+                return (datetime.ToUnixTimeMilliseconds(), null, null);
+            }
+
+            var 係数 = BinaryPrimitives.ReadUInt32BigEndian(d3);
+            var 積算電力量単位 = e1 switch
+            {
+                0x00 => 1m,
+                0x01 => 0.1m,
+                0x02 => 0.01m,
+                0x03 => 0.001m,
+                0x04 => 0.0001m,
+                0x0A => 10m,
+                0x0B => 100m,
+                0x0C => 1000m,
+                0x0D => 10000m,
+                _ => throw new InvalidOperationException($"積算電力量単位が不正値:{e1}"),
+            };
+
+            var normalVal = prop.Value[7..11];
+            var reverseVal = prop.Value[11..15];
+
+            decimal? normalKWh = normalVal.SequenceEqual(new byte[] { 0xFF, 0xFF, 0xFF, 0xFE })
+                ? null
+                : BinaryPrimitives.ReadUInt32BigEndian(normalVal) * 係数 * 積算電力量単位;
+
+            decimal? reverseKWh = reverseVal.SequenceEqual(new byte[] { 0xFF, 0xFF, 0xFF, 0xFE })
+                ? null
+                : BinaryPrimitives.ReadUInt32BigEndian(reverseVal) * 係数 * 積算電力量単位;
+
+            return (datetime.ToUnixTimeMilliseconds(), normalKWh, reverseKWh);
+        }
+    }
+
     public string? 設置場所
     {
         get

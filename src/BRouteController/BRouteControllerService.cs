@@ -77,6 +77,7 @@ public class BRouteControllerService : IDisposable
 
     public Func<Task>? PassivePropertiesReadedCallback;
     public Func<Task>? PassivePropertiesOnTimeCallback;
+    public Func<Task>? Passive1MinPropertiesReadedCallback;
     public Func<Task>? ActivePropertiesReadedCallback;
 
     public async Task ReadActivePropertiesAsync(bool continueOnError = false)
@@ -166,6 +167,40 @@ public class BRouteControllerService : IDisposable
                 //0xE0 積算電力量計測値 (正方向計測値)
                 //0xE3 積算電力量計測値 (逆方向計測値)
                 var target = new byte[] { 0xE0, 0xE3 };
+                var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
+                await ReadPropertyWithRetry(node, device, properties);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "プロパティ値読み出しで例外");
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    public async Task ReadPassive1MinPropertiesAsync()
+    {
+        var node = Meter.EchoNode;
+        var device = Meter.EchoObjectInstance;
+        await _semaphore.WaitAsync();
+        try
+        {
+            {
+                //0x97 現在時刻設定
+                //0x98 現在年月日設定
+                //0xD3 係数
+                //0xE1 積算電力量単位 （正方向、逆方向計測値）
+                //0xD7 積算電力量有効桁数
+                var target = new byte[] { 0x97, 0x98, 0xD3, 0xE1, 0xD7 };
+                var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
+                await ReadPropertyWithRetry(node, device, properties);
+            }
+            {
+                //0xD0 1分積算電力量計測値（正方向、逆方向計測値）
+                var target = new byte[] { 0xD0 };
                 var properties = device.GETProperties.Where(p => target.Contains(p.Spec.Code));
                 await ReadPropertyWithRetry(node, device, properties);
             }
@@ -343,6 +378,14 @@ public class BRouteControllerService : IDisposable
                     if (PassivePropertiesOnTimeCallback != null)
                     {
                         Task.Run(PassivePropertiesOnTimeCallback);
+                    }
+                }
+                if (echoPropertyInstance.Spec.Code == 0xD0)
+                {
+                    //0xD0 1分積算電力量計測値（正方向、逆方向計測値）
+                    if (Passive1MinPropertiesReadedCallback != null)
+                    {
+                        Task.Run(Passive1MinPropertiesReadedCallback);
                     }
                 }
                 if (echoPropertyInstance.Spec.Code == 0xE7 || echoPropertyInstance.Spec.Code == 0xE8)
