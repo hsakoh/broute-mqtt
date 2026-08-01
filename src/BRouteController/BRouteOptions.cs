@@ -25,6 +25,7 @@ public class BRouteOptions
     public TimeSpan PropertyReadTimeout { get; set; } = TimeSpan.FromSeconds(5);
     public int PropertyReadMaxRetryAttempts { get; set; } = 2;
     public TimeSpan PropertyReadRetryDelay { get; set; } = TimeSpan.FromSeconds(5);
+    public TimeSpan PropertyReadIntervalDelay { get; set; } = TimeSpan.FromSeconds(2);
 
     public bool ContinuePollingOnError { get; set; } = true;
 }

@@ -30,6 +30,7 @@ options:
     PropertyReadTimeout: '00:00:05'
     PropertyReadMaxRetryAttempts: 3
     PropertyReadRetryDelay: '00:00:05'
+    PropertyReadIntervalDelay: '00:00:02'
     ContinuePollingOnError: true
   Mqtt: 
     AutoConfig: true
@@ -56,6 +57,7 @@ schema:
     PropertyReadTimeout: str
     PropertyReadMaxRetryAttempts: int
     PropertyReadRetryDelay: str
+    PropertyReadIntervalDelay: str
     ContinuePollingOnError: bool
   Mqtt: 
     AutoConfig: bool

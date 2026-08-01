@@ -271,7 +271,7 @@ namespace EchoDotNetLite
             , IEnumerable<EchoPropertyInstance> properties
             , int timeoutMilliseconds = 1000)
         {
-            _logger.LogInformation("{Node}のプロパティ値を読み出します({Properties})", destinationNode.NodeProfile.GetDebugString(),
+            _logger.LogInformation("{Address} {Node}のプロパティ値を読み出します({Properties})", destinationNode.Address, destinationNode.NodeProfile.GetDebugString(),
                 string.Join(',', properties.Select(s => s.GetDebugString())));
             var responseTCS = new TaskCompletionSource<(bool, List<PropertyRequest>)>();
             var handler = default(EventHandler<(string, Frame)>);
@@ -566,7 +566,7 @@ namespace EchoDotNetLite
 
         private void インスタンスリスト通知受信(EchoNode sourceNode, byte[] edt)
         {
-            _logger.LogInformation("インスタンスリスト通知を受信しました");
+            _logger.LogInformation("{Address} インスタンスリスト通知を受信しました", sourceNode.Address);
             using (var ms = new MemoryStream(edt))
             using (var br = new BinaryReader(ms))
             {
@@ -590,14 +590,14 @@ namespace EchoDotNetLite
                     }
                     if (!device.IsPropertyMapGet)
                     {
-                        _logger.LogInformation("{Device} プロパティマップを読み取ります", device.GetDebugString());
+                        _logger.LogInformation("{Address} {Device} プロパティマップを読み取ります", sourceNode.Address, device.GetDebugString());
                         プロパティマップ読み取り(sourceNode, device);
                     }
                 }
             }
             if (!sourceNode.NodeProfile.IsPropertyMapGet)
             {
-                _logger.LogInformation("{Node} プロパティマップを読み取ります", sourceNode.NodeProfile.GetDebugString());
+                _logger.LogInformation("{Address} {Node} プロパティマップを読み取ります", sourceNode.Address, sourceNode.NodeProfile.GetDebugString());
                 プロパティマップ読み取り(sourceNode, sourceNode.NodeProfile);
             }
         }
@@ -614,16 +614,16 @@ namespace EchoDotNetLite
             {
                 if (!result.IsCompletedSuccessfully)
                 {
-                    _logger.LogWarning("{Device} プロパティマップの読み取りがタイムアウトしました", device.GetDebugString());
+                    _logger.LogWarning("{Address} {Device} プロパティマップの読み取りがタイムアウトしました", sourceNode.Address, device.GetDebugString());
                     return;
                 }
                 //不可応答は無視
                 if (!result.Result.Item1)
                 {
-                    _logger.LogWarning("{Device} プロパティマップの読み取りで不可応答が返答されました", device.GetDebugString());
+                    _logger.LogWarning("{Address} {Device} プロパティマップの読み取りで不可応答が返答されました", sourceNode.Address, device.GetDebugString());
                     return;
                 }
-                _logger.LogInformation("{Device} プロパティマップの読み取りが成功しました", device.GetDebugString());
+                _logger.LogInformation("{Address} {Device} プロパティマップの読み取りが成功しました", sourceNode.Address, device.GetDebugString());
                 device.Properties.Clear();
                 foreach (var pr in result.Result.Item2)
                 {
@@ -772,6 +772,20 @@ namespace EchoDotNetLite
                     destObject = device;
                 }
                 Task task = null;
+
+                //INF 系は相手からの自発的な送信である。
+                //状変アナウンスプロパティマップに載せていないプロパティを通知してくる機器があり、
+                //どのプロパティが実際に通知されるかはマップからは判断できないため、
+                //受信の事実そのものを info で残す
+                if (edata.ESV is ESV.INF or ESV.INFC or ESV.INF_REQ or ESV.INFC_Res or ESV.INF_SNA)
+                {
+                    _logger.LogInformation("{Address} {ESV}(0x{ESVCode:X2}) 受信 SEOJ:{SEOJ} DEOJ:{DEOJ} ({Properties})",
+                        value.address, edata.ESV, (byte)edata.ESV,
+                        edata.SEOJ.GetDebugString(), edata.DEOJ.GetDebugString(),
+                        edata.OPCList == null
+                            ? string.Empty
+                            : string.Join(',', edata.OPCList.Select(o => $"0x{o.EPC:X2}({o.PDC}B)")));
+                }
 
                 switch (edata.ESV)
                 {

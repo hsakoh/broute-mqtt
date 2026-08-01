@@ -17,6 +17,10 @@ namespace EchoDotNetLite.Common
             }
             return $"0x{echoObjectInstance.Spec.ClassGroup.ClassGroupCode:X2}{echoObjectInstance.Spec.ClassGroup.ClassGroupName} 0x{echoObjectInstance.Spec.Class.ClassCode:X2}{echoObjectInstance.Spec.Class.ClassName} {echoObjectInstance.InstanceCode:X2}";
         }
+        public static string GetDebugString(this EOJ eoj)
+        {
+            return $"0x{eoj.ClassGroupCode:X2}{eoj.ClassCode:X2} {eoj.InstanceCode:X2}";
+        }
         public static string GetDebugString(this EchoPropertyInstance echoPropertyInstance)
         {
             if (echoPropertyInstance == null)

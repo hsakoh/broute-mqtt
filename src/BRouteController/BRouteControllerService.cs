@@ -143,7 +143,7 @@ public class BRouteControllerService : IDisposable
             _logger.LogWarning("プロパティ値読み出し リトライオーバー");
             throw new ApplicationException("プロパティ値読み出し リトライオーバー");
         }
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(_optionsMonitor.CurrentValue.PropertyReadIntervalDelay);
     }
 
     public async Task ReadPassivePropertiesAsync()
@@ -358,7 +358,7 @@ public class BRouteControllerService : IDisposable
     {
         if (sender is EchoPropertyInstance echoPropertyInstance)
         {
-            _logger.LogInformation("EchoProperty Change {Property} {HexValue}", echoPropertyInstance.GetDebugString(), SkstackIpDotNet.BytesConvert.ToHexString(e));
+            _logger.LogDebug("EchoProperty Change {Property} {HexValue}", echoPropertyInstance.GetDebugString(), SkstackIpDotNet.BytesConvert.ToHexString(e));
 
             if (Meter != null)
             {
