@@ -49,7 +49,7 @@ namespace SkstackIpDotNet
         //Task<ENEIGHBOR> SKTableENeighborAsync();
         //Task<ESEC> SKTableESecAsync();
         //Task<OKorFAIL> SKTcpPortAsync(string index, string port);
-        //Task<OKorFAIL> SKTermAsync();
+        Task<OKorFAIL> SKTermAsync();
         //Task<OKorFAIL> SKUdpPortAsync(string handle, string port);
         //Task<EVER> SKVerAsync();
     }
