@@ -145,7 +145,7 @@ Enhanced HAN」※2 対応のものは<br>コマンドの引数や使い方が�
 |BRoute:InstantaneousValueInterval|`00:01:10`|瞬時値の周期的な取得間隔を指定します<br>複数モードでは巡回の開始間隔として扱われます<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PanScanMaxRetryAttempts|`3`|PANスキャンの最大再試行回数を指定します|
 |BRoute:PanScanRetryDelay|`00:01:00`|PANスキャンの再試行間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
-|BRoute:PanaConnectTimeout|`00:00:30`|PANA接続のタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
+|BRoute:PanaConnectTimeout|`00:01:00`|PANA接続のタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:PanaConnectMaxRetryAttempts|`3`|PANA接続の最大再試行回数を指定します|
 |BRoute:PanaConnectRetryDelay|`00:01:00`|PANA接続の再試行間隔を指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|
 |BRoute:SkTermTimeout|`00:00:10`|複数モードでのセッション切断(SKTERM)の完了待ちタイムアウトを指定します<br>TimeSpan(`HH:mm:ss`)形式で記述します|

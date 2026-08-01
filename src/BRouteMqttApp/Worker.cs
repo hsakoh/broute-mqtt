@@ -18,8 +18,8 @@ public class Worker(
     private string GetSerial(低圧スマート電力量メータ meter)
         => meter.製造番号! + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "_wisun" : "");
 
-    private string DeviceName
-        => nameof(低圧スマート電力量メータ) + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "(Wi-SUN)" : "");
+    private string GetDeviceName(低圧スマート電力量メータ meter)
+        => $"{nameof(低圧スマート電力量メータ)} ({meter.製造番号})" + (bRouteOptions.CurrentValue.AddWiSunSuffix ? "(Wi-SUN)" : "");
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -77,48 +77,48 @@ public class Worker(
     private async Task PublishDeviceConfigsAsync(低圧スマート電力量メータ meter)
     {
         var serial = GetSerial(meter);
-        await PublishSensorConfigAsync(serial, "placement", "設置場所", "static", icon: "mdi:map-marker");
-        await PublishSensorConfigAsync(serial, "version", "規格Version情報", "static", icon: "mdi:information");
-        await PublishSensorConfigAsync(serial, "makercode", "メーカコード", "static", icon: "mdi:factory");
-        await PublishSensorConfigAsync(serial, "serialnumber", "製造番号", "static", icon: "mdi:identifier");
+        await PublishSensorConfigAsync(meter, serial, "placement", "設置場所", "static", icon: "mdi:map-marker");
+        await PublishSensorConfigAsync(meter, serial, "version", "規格Version情報", "static", icon: "mdi:information");
+        await PublishSensorConfigAsync(meter, serial, "makercode", "メーカコード", "static", icon: "mdi:factory");
+        await PublishSensorConfigAsync(meter, serial, "serialnumber", "製造番号", "static", icon: "mdi:identifier");
         if (MeterHasEpc(meter, 0xC0))
         {
             //0xC0 Bルート識別番号(第2世代スマートメーターのみ)
-            await PublishSensorConfigAsync(serial, "b_route_id", "Bルート識別番号", "static", icon: "mdi:identifier");
+            await PublishSensorConfigAsync(meter, serial, "b_route_id", "Bルート識別番号", "static", icon: "mdi:identifier");
         }
         if (MeterHasEpc(meter, 0xD0))
         {
             //0xD0 1分積算電力量計測値(第2世代スマートメーターのみ)
-            await PublishSensorConfigAsync(serial, "cumulative_1min_normal", "1分積算電力量計測値(正方向)", "passive_1min"
+            await PublishSensorConfigAsync(meter, serial, "cumulative_1min_normal", "1分積算電力量計測値(正方向)", "passive_1min"
                 , device_class: "energy", state_class: "total_increasing", unit_of_measurement: "kWh");
-            await PublishSensorConfigAsync(serial, "cumulative_1min_reverse", "1分積算電力量計測値(逆方向)", "passive_1min"
+            await PublishSensorConfigAsync(meter, serial, "cumulative_1min_reverse", "1分積算電力量計測値(逆方向)", "passive_1min"
                 , device_class: "energy", state_class: "total_increasing", unit_of_measurement: "kWh");
-            await PublishSensorConfigAsync(serial, "passive_1min_timestamp", "更新日時(1分積算電力量)", "passive_1min"
+            await PublishSensorConfigAsync(meter, serial, "passive_1min_timestamp", "更新日時(1分積算電力量)", "passive_1min"
                 , device_class: "timestamp", value_template: "{% set ts = value_json.get('timestamp', {})  %} {% if ts %}\n  {{ (ts / 1000) | timestamp_local | as_datetime }}\n{% else %}\n  {{ this.state }}\n{% endif %}");
         }
 
-        await PublishSensorConfigAsync(serial, "cumulative_normal", "積算電力量計測値(正方向)", "passive"
+        await PublishSensorConfigAsync(meter, serial, "cumulative_normal", "積算電力量計測値(正方向)", "passive"
             , device_class: "energy", state_class: "total_increasing", unit_of_measurement: "kWh");
-        await PublishSensorConfigAsync(serial, "cumulative_reverse", "積算電力量計測値(逆方向)", "passive"
+        await PublishSensorConfigAsync(meter, serial, "cumulative_reverse", "積算電力量計測値(逆方向)", "passive"
             , device_class: "energy", state_class: "total_increasing", unit_of_measurement: "kWh");
-        await PublishSensorConfigAsync(serial, "passive_timestamp", "更新日時(積算電力量)", "passive"
+        await PublishSensorConfigAsync(meter, serial, "passive_timestamp", "更新日時(積算電力量)", "passive"
             , device_class: "timestamp", value_template: "{% set ts = value_json.get('timestamp', {})  %} {% if ts %}\n  {{ (ts / 1000) | timestamp_local | as_datetime }}\n{% else %}\n  {{ this.state }}\n{% endif %}");
 
 
-        await PublishSensorConfigAsync(serial, "instantaneous_current_r", "瞬時電流計測値(R相)", "active"
+        await PublishSensorConfigAsync(meter, serial, "instantaneous_current_r", "瞬時電流計測値(R相)", "active"
             , device_class: "current", state_class: "measurement", unit_of_measurement: "A");
-        await PublishSensorConfigAsync(serial, "instantaneous_current_t", "瞬時電流計測値(T相)", "active"
+        await PublishSensorConfigAsync(meter, serial, "instantaneous_current_t", "瞬時電流計測値(T相)", "active"
             , device_class: "current", state_class: "measurement", unit_of_measurement: "A");
-        await PublishSensorConfigAsync(serial, "instantaneous_electric_power", "瞬時電力計測値", "active"
+        await PublishSensorConfigAsync(meter, serial, "instantaneous_electric_power", "瞬時電力計測値", "active"
             , device_class: "power", state_class: "measurement", unit_of_measurement: "W");
-        await PublishSensorConfigAsync(serial, "active_timestamp", "更新日時(瞬時値)", "active"
+        await PublishSensorConfigAsync(meter, serial, "active_timestamp", "更新日時(瞬時値)", "active"
             , device_class: "timestamp", value_template: "{% set ts = value_json.get('timestamp', {})  %} {% if ts %}\n  {{ (ts / 1000) | timestamp_local | as_datetime }}\n{% else %}\n  {{ this.state }}\n{% endif %}");
 
-        await SendButtonConfigAsync(serial, "active", "瞬時値の取得", "update");
-        await SendButtonConfigAsync(serial, "passive", "積算電力量の取得", "update");
+        await SendButtonConfigAsync(meter, serial, "active", "瞬時値の取得", "update");
+        await SendButtonConfigAsync(meter, serial, "passive", "積算電力量の取得", "update");
         if (MeterHasEpc(meter, 0xD0))
         {
-            await SendButtonConfigAsync(serial, "1min", "1分積算電力量の取得", "update");
+            await SendButtonConfigAsync(meter, serial, "1min", "1分積算電力量の取得", "update");
         }
 
     }
@@ -127,7 +127,7 @@ public class Worker(
         => meter.EchoObjectInstance.GETProperties.Any(p => p.Spec.Code == code);
 
     private async Task PublishSensorConfigAsync(
-        string serial, string type, string name, string subTopic
+        低圧スマート電力量メータ meter, string serial, string type, string name, string subTopic
         , string? icon = null
         , string? device_class = null
         , string? state_class = null
@@ -148,13 +148,13 @@ public class Worker(
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
-                name = DeviceName,
+                name = GetDeviceName(meter),
             },
         };
         await mqttService.PublishAsync($"homeassistant/sensor/{type}_{serial}/config", payload, true);
     }
 
-    private async Task SendButtonConfigAsync(string serial, string type, string name, string device_class)
+    private async Task SendButtonConfigAsync(低圧スマート電力量メータ meter, string serial, string type, string name, string device_class)
     {
         var payload = new
         {
@@ -168,7 +168,7 @@ public class Worker(
             device = new
             {
                 identifiers = new[] { $"smart_meter_{serial}" },
-                name = DeviceName,
+                name = GetDeviceName(meter),
             },
         };
         await mqttService.PublishAsync($"homeassistant/button/btn_{type}_{serial}/config", payload, true);

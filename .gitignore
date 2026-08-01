@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 /src/BRouteMqttApp/appsettings.Development.json
 /src/BRouteMqttApp/Data/EPANDESC.json
+/src/BRouteMqttApp/Data/EPANDESC.*.json
